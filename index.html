@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dona Chocolate — Artisan Sweets for Celebrations</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--gold:#C97B5A;--gold-light:#D99B7E;--gold-dark:#A6604A;--gold-glow:rgba(232,150,63,.15);
+--black:#0A0A0A;--black-soft:#111;--black-card:#161616;--black-elevated:#1E1E1E;
+--white:#F5F0EA;--white-pure:#fff;--gray:#888;--gray-light:#aaa;--gray-dark:#2A2A2A;
+--success:#4CAF50;--danger:#E53935;
+--font-display:'Cormorant Garamond',Georgia,serif;
+--font-body:'DM Sans','Segoe UI',sans-serif;
+--radius:14px;--radius-sm:8px;--radius-lg:20px;
+--transition:all .3s cubic-bezier(.4,0,.2,1);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--black);color:var(--white);overflow-x:hidden;line-height:1.6}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:var(--font-body);border:none;background:none}
+img{max-width:100%;display:block}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--black)}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+
+/* ===== HEADER ===== */
+.header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,10,10,.88);backdrop-filter:blur(24px);border-bottom:1px solid rgba(232,150,63,.08);transition:var(--transition)}
+.header-inner{max-width:1440px;margin:0 auto;padding:0 2.5rem;display:flex;align-items:center;justify-content:space-between;height:85px}
+.logo-wrap{display:flex;align-items:center;gap:0}
+.logo-wrap img{height:65px;filter:drop-shadow(0 0 20px rgba(232,150,63,.25));transition:var(--transition)}
+.logo-wrap:hover img{filter:drop-shadow(0 0 30px rgba(232,150,63,.45));transform:scale(1.03)}
+.nav{display:flex;align-items:center;gap:2.2rem}
+.nav a{font-size:.82rem;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--gray-light);transition:var(--transition);position:relative}
+.nav a:hover,.nav a.active{color:var(--gold)}
+.nav a::after{content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:0;height:2px;background:var(--gold);transition:var(--transition);border-radius:1px}
+.nav a:hover::after,.nav a.active::after{width:100%}
+.header-actions{display:flex;align-items:center;gap:1rem}
+.search-box{position:relative}
+.search-box input{background:rgba(255,255,255,.04);border:1px solid var(--gray-dark);color:var(--white);padding:.65rem 1rem .65rem 2.5rem;border-radius:50px;font-size:.82rem;width:200px;transition:var(--transition);outline:none}
+.search-box input:focus{border-color:var(--gold);width:260px;background:rgba(232,150,63,.04)}
+.search-box input::placeholder{color:var(--gray)}
+.search-icon{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--gray)}
+.cart-btn{position:relative;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:var(--black);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:var(--transition);font-size:1.15rem;box-shadow:0 4px 16px rgba(232,150,63,.2)}
+.cart-btn:hover{transform:scale(1.08);box-shadow:0 6px 24px rgba(232,150,63,.35)}
+.cart-count{position:absolute;top:-3px;right:-3px;background:var(--danger);color:var(--white-pure);font-size:.6rem;font-weight:700;width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--black)}
+.mobile-menu-btn{display:none;color:var(--gold);font-size:1.4rem}
+
+/* ===== HERO WITH PROMINENT LOGO ===== */
+.hero{margin-top:85px;position:relative;overflow:hidden;min-height:85vh;display:flex;align-items:center;background:var(--black)}
+.hero-bg{position:absolute;inset:0;background:
+  radial-gradient(ellipse 80% 60% at 50% 40%,rgba(232,150,63,.06) 0%,transparent 70%),
+  radial-gradient(ellipse 50% 50% at 80% 20%,rgba(196,122,42,.04) 0%,transparent 60%),
+  radial-gradient(ellipse 40% 40% at 15% 80%,rgba(232,150,63,.03) 0%,transparent 60%);
+pointer-events:none}
+.hero-grain{position:absolute;inset:0;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");pointer-events:none}
+.hero-inner{max-width:1440px;margin:0 auto;padding:0 2.5rem;width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:1}
+.hero-logo-showcase{margin-bottom:2.5rem;position:relative}
+.hero-logo-showcase img{height:180px;filter:drop-shadow(0 0 60px rgba(232,150,63,.3)) drop-shadow(0 0 120px rgba(232,150,63,.1));animation:logoPulse 4s ease-in-out infinite}
+.hero-logo-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:400px;height:400px;background:radial-gradient(circle,rgba(232,150,63,.08) 0%,transparent 70%);border-radius:50%;pointer-events:none;animation:glowPulse 4s ease-in-out infinite}
+@keyframes logoPulse{0%,100%{filter:drop-shadow(0 0 60px rgba(232,150,63,.3)) drop-shadow(0 0 120px rgba(232,150,63,.1))}50%{filter:drop-shadow(0 0 80px rgba(232,150,63,.4)) drop-shadow(0 0 140px rgba(232,150,63,.15))}}
+@keyframes glowPulse{0%,100%{opacity:1;transform:translate(-50%,-50%) scale(1)}50%{opacity:.7;transform:translate(-50%,-50%) scale(1.1)}}
+.hero-divider{width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 2rem}
+.hero-tagline{font-family:var(--font-display);font-size:3.2rem;font-weight:700;line-height:1.15;margin-bottom:1rem;letter-spacing:-.5px}
+.hero-tagline span{color:var(--gold);font-style:italic}
+.hero-sub{font-size:1.05rem;color:var(--gray-light);max-width:560px;margin:0 auto 2.5rem;line-height:1.7}
+.hero-cta{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 2.2rem;border-radius:50px;font-weight:600;font-size:.9rem;transition:var(--transition);letter-spacing:.4px}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:var(--black);box-shadow:0 4px 20px rgba(232,150,63,.25)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(232,150,63,.4)}
+.btn-outline{border:1.5px solid rgba(232,150,63,.4);color:var(--gold)}
+.btn-outline:hover{background:var(--gold);color:var(--black);border-color:var(--gold)}
+.hero-stats{display:flex;gap:3.5rem;margin-top:4rem;padding-top:3rem;border-top:1px solid rgba(255,255,255,.05)}
+.hero-stat{text-align:center}
+.hero-stat .num{font-family:var(--font-display);font-size:2.4rem;font-weight:700;color:var(--gold)}
+.hero-stat .label{font-size:.75rem;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;margin-top:.2rem}
+
+/* ===== FEATURES BAR ===== */
+.features-bar{background:linear-gradient(135deg,var(--gold),var(--gold-dark));padding:1.1rem 2rem}
+.features-inner{max-width:1440px;margin:0 auto;display:flex;justify-content:space-around;flex-wrap:wrap;gap:.8rem}
+.feature-item{display:flex;align-items:center;gap:.5rem;color:var(--black);font-weight:600;font-size:.82rem;letter-spacing:.3px}
+.feature-item span.fi{font-size:1.1rem}
+
+/* ===== SECTIONS ===== */
+.section{padding:5rem 2.5rem}
+.section-header{max-width:1440px;margin:0 auto 2.5rem;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.section-title{font-family:var(--font-display);font-size:2.6rem;font-weight:700;letter-spacing:-.3px}
+.section-title span{color:var(--gold);font-style:italic}
+.view-all{color:var(--gold);font-weight:600;font-size:.82rem;display:flex;align-items:center;gap:.3rem;transition:var(--transition);letter-spacing:.5px;text-transform:uppercase}
+.view-all:hover{gap:.6rem;color:var(--gold-light)}
+
+/* ===== PROMOS ===== */
+.promos-grid{max-width:1440px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.promo-card{position:relative;border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:var(--transition);min-height:240px;display:flex;flex-direction:column;justify-content:flex-end;padding:2rem}
+.promo-card:hover{transform:translateY(-5px);box-shadow:0 16px 48px rgba(0,0,0,.5)}
+.promo-card.p1{background:linear-gradient(135deg,#162a1a 0%,#0d1a10 100%);border:1px solid rgba(76,175,80,.15)}
+.promo-card.p2{background:linear-gradient(135deg,#2a1616 0%,#1a0d0d 100%);border:1px solid rgba(229,57,53,.15)}
+.promo-card.p3{background:linear-gradient(135deg,#16202a 0%,#0d141a 100%);border:1px solid rgba(33,150,243,.15)}
+.promo-badge{position:absolute;top:1rem;right:1rem;background:var(--danger);color:var(--white-pure);padding:.25rem .75rem;border-radius:50px;font-size:.7rem;font-weight:700;letter-spacing:.8px}
+.promo-badge.new-b{background:var(--gold);color:var(--black)}
+.promo-badge.combo-b{background:#7C4DFF;color:var(--white-pure)}
+.promo-emoji{font-size:3rem;margin-bottom:.6rem}
+.promo-title{font-family:var(--font-display);font-size:1.5rem;font-weight:700;margin-bottom:.3rem}
+.promo-desc{font-size:.82rem;color:var(--gray-light);line-height:1.5}
+.promo-timer{display:flex;gap:.4rem;margin-top:.8rem}
+.timer-unit{background:rgba(255,255,255,.06);padding:.3rem .55rem;border-radius:var(--radius-sm);font-size:.78rem;font-weight:600;text-align:center;min-width:48px}
+.timer-unit small{display:block;font-size:.55rem;color:var(--gray);font-weight:400;text-transform:uppercase;letter-spacing:.5px}
+
+/* ===== CATEGORIES ===== */
+.categories-scroll{max-width:1440px;margin:0 auto;display:flex;gap:.8rem;overflow-x:auto;padding-bottom:.5rem;-ms-overflow-style:none;scrollbar-width:none}
+.categories-scroll::-webkit-scrollbar{display:none}
+.cat-pill{flex-shrink:0;background:var(--black-card);border:1px solid var(--gray-dark);border-radius:50px;padding:.7rem 1.5rem;display:flex;align-items:center;gap:.5rem;cursor:pointer;transition:var(--transition);font-size:.82rem;font-weight:500}
+.cat-pill:hover,.cat-pill.active{border-color:var(--gold);background:rgba(232,150,63,.06);color:var(--gold)}
+.cat-pill .ce{font-size:1.15rem}
+
+/* ===== PRODUCTS ===== */
+.products-container{max-width:1440px;margin:0 auto}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem}
+.product-card{background:var(--black-card);border:1px solid rgba(255,255,255,.04);border-radius:var(--radius-lg);overflow:hidden;transition:var(--transition);position:relative}
+.product-card:hover{border-color:rgba(232,150,63,.2);transform:translateY(-5px);box-shadow:0 16px 48px rgba(0,0,0,.5)}
+.product-img{height:210px;position:relative;overflow:hidden;background:var(--black-soft)}
+.product-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.product-card:hover .product-img img{transform:scale(1.06)}
+.product-img::after{content:'';position:absolute;bottom:0;left:0;right:0;height:50%;background:linear-gradient(transparent,var(--black-card));pointer-events:none}
+.product-badge{position:absolute;top:.8rem;left:.8rem;z-index:2;padding:.2rem .65rem;border-radius:50px;font-size:.65rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.badge-sale{background:var(--danger);color:var(--white-pure)}
+.badge-new{background:var(--gold);color:var(--black)}
+.badge-popular{background:rgba(124,77,255,.9);color:var(--white-pure)}
+.product-info{padding:1.2rem 1.4rem 1.4rem}
+.product-cat{font-size:.65rem;text-transform:uppercase;letter-spacing:2px;color:var(--gold);font-weight:600;margin-bottom:.35rem}
+.product-name{font-family:var(--font-display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem;line-height:1.25}
+.product-desc{font-size:.78rem;color:var(--gray);margin-bottom:.9rem;line-height:1.5}
+.product-bottom{display:flex;align-items:center;justify-content:space-between}
+.product-price{font-size:1.25rem;font-weight:700;color:var(--gold)}
+.product-price .old{font-size:.8rem;color:var(--gray);text-decoration:line-through;margin-right:.3rem;font-weight:400}
+.add-btn{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:var(--black);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:var(--transition);font-size:1.3rem;font-weight:700;box-shadow:0 3px 12px rgba(232,150,63,.2)}
+.add-btn:hover{transform:scale(1.12);box-shadow:0 5px 20px rgba(232,150,63,.35)}
+.qty-controls{display:flex;align-items:center;gap:.4rem}
+.qty-btn{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;transition:var(--transition)}
+.qty-btn.minus{background:var(--black-elevated);color:var(--white);border:1px solid var(--gray-dark)}
+.qty-btn.minus:hover{border-color:var(--danger);color:var(--danger)}
+.qty-btn.plus{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:var(--black)}
+.qty-btn.plus:hover{transform:scale(1.08)}
+.qty-num{font-weight:700;font-size:.9rem;min-width:22px;text-align:center}
+
+/* ===== INSTRUCTIONS ===== */
+.instructions-container{max-width:1440px;margin:0 auto}
+.instructions-intro{text-align:center;color:var(--gray-light);font-size:1.05rem;max-width:600px;margin:0 auto 3rem;line-height:1.7}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-bottom:3rem}
+.step-card{background:var(--black-card);border:1px solid rgba(255,255,255,.04);border-radius:var(--radius-lg);padding:2rem 1.5rem;text-align:center;position:relative;transition:var(--transition);overflow:hidden}
+.step-card:hover{border-color:rgba(232,150,63,.2);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.step-number{position:absolute;top:.8rem;left:1rem;font-family:var(--font-display);font-size:3rem;font-weight:700;color:rgba(232,150,63,.07);line-height:1;pointer-events:none}
+.step-icon{font-size:2.5rem;margin-bottom:1rem}
+.step-card h3{font-family:var(--font-display);font-size:1.2rem;font-weight:700;margin-bottom:.6rem;color:var(--gold)}
+.step-card p{font-size:.82rem;color:var(--gray-light);line-height:1.6}
+.step-card p strong{color:var(--white)}
+.instructions-tips{background:var(--black-card);border:1px solid rgba(232,150,63,.1);border-radius:var(--radius-lg);padding:2rem}
+.instructions-tips h4{font-family:var(--font-display);font-size:1.2rem;font-weight:700;margin-bottom:1.2rem;text-align:center}
+.tips-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.tip{font-size:.85rem;color:var(--gray-light);padding:.6rem 1rem;background:rgba(255,255,255,.02);border-radius:var(--radius-sm);line-height:1.5}
+@media(max-width:1024px){.steps-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){.steps-grid{grid-template-columns:1fr}.tips-grid{grid-template-columns:1fr}}
+
+/* ===== CART SIDEBAR ===== */
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px)}
+.cart-overlay.open{opacity:1;pointer-events:all}
+.cart-sidebar{position:fixed;top:0;right:-500px;width:min(480px,100vw);height:100vh;background:var(--black-soft);z-index:2001;transition:right .4s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;border-left:1px solid rgba(232,150,63,.08)}
+.cart-sidebar.open{right:0}
+.cart-header{padding:1.5rem 2rem;border-bottom:1px solid var(--gray-dark);display:flex;align-items:center;justify-content:space-between}
+.cart-header h2{font-family:var(--font-display);font-size:1.6rem;font-weight:700}
+.cart-header h2 span{color:var(--gold)}
+.close-cart{color:var(--gray);font-size:1.4rem;transition:var(--transition);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.close-cart:hover{color:var(--white);background:var(--black-elevated)}
+.cart-items{flex:1;overflow-y:auto;padding:1.5rem 2rem}
+.cart-empty{text-align:center;padding:4rem 1rem;color:var(--gray)}
+.cart-empty .ce{font-size:3.5rem;margin-bottom:1rem;display:block}
+.cart-item{display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,.04);animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.cart-item-img{width:65px;height:65px;background:var(--black-card);border-radius:var(--radius-sm);overflow:hidden;flex-shrink:0}
+.cart-item-img img{width:100%;height:100%;object-fit:cover}
+.cart-item-info{flex:1}
+.cart-item-name{font-weight:600;font-size:.85rem;margin-bottom:.15rem}
+.cart-item-price{color:var(--gold);font-weight:700;font-size:.85rem}
+.cart-item-controls{display:flex;align-items:center;gap:.35rem;margin-top:.35rem}
+.cart-item-controls .qty-btn{width:26px;height:26px;font-size:.8rem}
+.cart-item-controls .qty-num{font-size:.8rem}
+.cart-item-remove{color:var(--gray);font-size:.7rem;margin-left:.5rem;transition:var(--transition);letter-spacing:.3px}
+.cart-item-remove:hover{color:var(--danger)}
+.cart-footer{padding:1.5rem 2rem;border-top:1px solid var(--gray-dark);background:var(--black-card)}
+.cart-subtotal{display:flex;justify-content:space-between;margin-bottom:.4rem;font-size:.85rem;color:var(--gray-light)}
+.cart-total{display:flex;justify-content:space-between;font-size:1.25rem;font-weight:700;margin-bottom:1.2rem}
+.cart-total .price{color:var(--gold)}
+.checkout-btn{width:100%;padding:1rem;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:var(--black);font-weight:700;font-size:.95rem;border-radius:50px;transition:var(--transition);letter-spacing:.5px;box-shadow:0 4px 16px rgba(232,150,63,.25)}
+.checkout-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(232,150,63,.4)}
+.cart-note{text-align:center;font-size:.72rem;color:var(--gray);margin-top:.6rem}
+
+/* ===== ABOUT ===== */
+.about-grid{max-width:1440px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.about-text p{color:var(--gray-light);font-size:1rem;line-height:1.8;margin-bottom:1.5rem}
+.about-values{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.value-card{background:var(--black-card);border:1px solid rgba(255,255,255,.04);border-radius:var(--radius);padding:1.5rem;transition:var(--transition)}
+.value-card:hover{border-color:rgba(232,150,63,.15)}
+.value-card .ve{font-size:1.6rem;margin-bottom:.5rem;display:block}
+.value-card h4{font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:.3rem}
+.value-card p{font-size:.78rem;color:var(--gray);line-height:1.5}
+.about-visual{position:relative;display:flex;justify-content:center;align-items:center}
+.about-logo{height:200px;filter:drop-shadow(0 0 80px rgba(232,150,63,.25));animation:logoPulse 4s ease-in-out infinite}
+.about-ring{position:absolute;width:350px;height:350px;border:1px solid rgba(232,150,63,.08);border-radius:50%;animation:spin 30s linear infinite}
+.about-ring2{position:absolute;width:420px;height:420px;border:1px dashed rgba(232,150,63,.05);border-radius:50%;animation:spin 45s linear infinite reverse}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+/* ===== FOOTER ===== */
+.footer{background:var(--black-soft);border-top:1px solid rgba(232,150,63,.06);padding:4rem 2.5rem 2rem}
+.footer-inner{max-width:1440px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem}
+.footer-brand img{height:55px;margin-bottom:1rem;filter:drop-shadow(0 0 16px rgba(232,150,63,.2))}
+.footer-brand p{color:var(--gray);font-size:.82rem;line-height:1.6;max-width:300px}
+.footer-col h4{font-family:var(--font-display);color:var(--gold);font-size:1.05rem;margin-bottom:1rem;font-weight:700}
+.footer-col a{display:block;color:var(--gray-light);font-size:.82rem;margin-bottom:.45rem;transition:var(--transition)}
+.footer-col a:hover{color:var(--gold)}
+.footer-bottom{max-width:1440px;margin:2rem auto 0;padding-top:2rem;border-top:1px solid var(--gray-dark);display:flex;justify-content:space-between;align-items:center;font-size:.75rem;color:var(--gray)}
+.social-links{display:flex;gap:.8rem}
+.social-links a{width:36px;height:36px;border-radius:50%;border:1px solid var(--gray-dark);display:flex;align-items:center;justify-content:center;transition:var(--transition);font-size:.85rem}
+.social-links a:hover{border-color:var(--gold);color:var(--gold);background:rgba(232,150,63,.05)}
+
+/* ===== PRODUCT MODAL ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:3000;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(6px)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);z-index:3001;background:var(--black-soft);border:1px solid rgba(232,150,63,.1);border-radius:var(--radius-lg);width:min(720px,94vw);max-height:90vh;overflow-y:auto;opacity:0;pointer-events:none;transition:all .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+.modal.open{opacity:1;pointer-events:all;transform:translate(-50%,-50%) scale(1)}
+.modal::-webkit-scrollbar{width:4px}
+.modal::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
+.modal-close{position:absolute;top:1rem;right:1rem;z-index:10;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);color:var(--white);font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:var(--transition);border:1px solid rgba(255,255,255,.1)}
+.modal-close:hover{background:var(--danger);border-color:var(--danger)}
+.modal-img{width:100%;height:300px;overflow:hidden;flex-shrink:0;position:relative}
+.modal-img img{width:100%;height:100%;object-fit:cover}
+.modal-img::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(transparent,var(--black-soft))}
+.modal-body{padding:1.8rem 2rem 2rem}
+.modal-cat{font-size:.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--gold);font-weight:600;margin-bottom:.3rem}
+.modal-title{font-family:var(--font-display);font-size:2rem;font-weight:700;margin-bottom:.5rem;line-height:1.2}
+.modal-desc{color:var(--gray-light);font-size:.95rem;line-height:1.6;margin-bottom:1.5rem}
+.modal-meta{display:flex;gap:1rem;margin-bottom:1.8rem;flex-wrap:wrap}
+.meta-item{flex:1;min-width:120px;display:flex;align-items:center;gap:.7rem;background:var(--black-card);border:1px solid rgba(255,255,255,.04);border-radius:var(--radius);padding:.9rem 1rem}
+.meta-item .meta-icon{font-size:1.4rem}
+.meta-item small{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--gray);margin-bottom:.1rem}
+.meta-item strong{font-size:.9rem;color:var(--white)}
+.modal-section{margin-bottom:1.5rem}
+.modal-section h4{font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--gold);margin-bottom:.6rem}
+.modal-section p{font-size:.85rem;color:var(--gray-light);line-height:1.7}
+.modal-actions{display:flex;gap:1rem;align-items:center;padding-top:.5rem;border-top:1px solid rgba(255,255,255,.04)}
+.modal-add-btn{flex:1;padding:1rem;font-size:1rem;justify-content:center}
+.modal-qty-wrap{display:flex;align-items:center;gap:.5rem}
+.modal-qty-wrap .qty-btn{width:38px;height:38px;font-size:1.1rem}
+.modal-qty-wrap .qty-num{font-size:1.1rem;min-width:28px;text-align:center}
+@media(max-width:768px){
+.modal-img{height:220px}
+.modal-body{padding:1.2rem 1.3rem 1.5rem}
+.modal-title{font-size:1.5rem}
+.modal-meta{gap:.6rem}
+.meta-item{padding:.7rem .8rem}
+}
+
+/* ===== TOAST ===== */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--success);color:var(--white-pure);padding:.9rem 1.4rem;border-radius:var(--radius);font-weight:600;font-size:.85rem;z-index:3000;transform:translateY(100px);opacity:0;transition:all .4s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:.5rem;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ===== WA FLOAT ===== */
+.wa-float{position:fixed;bottom:2rem;left:2rem;z-index:999;width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:1.5rem;box-shadow:0 4px 20px rgba(37,211,102,.35);transition:var(--transition)}
+.wa-float:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(37,211,102,.5)}
+
+/* ===== ANIMATIONS ===== */
+.fade-in{opacity:0;transform:translateY(24px);transition:all .7s cubic-bezier(.4,0,.2,1)}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1024px){
+.promos-grid{grid-template-columns:1fr 1fr}
+.about-grid{grid-template-columns:1fr}
+.about-visual{margin-top:2rem}
+.footer-inner{grid-template-columns:1fr 1fr}
+.hero-tagline{font-size:2.6rem}
+.hero-logo-showcase img{height:140px}
+}
+@media(max-width:768px){
+.nav{display:none}
+.mobile-menu-btn{display:block}
+.search-box input{width:130px}
+.search-box input:focus{width:170px}
+.hero{min-height:auto;padding:3rem 0 2rem}
+.hero-tagline{font-size:2rem}
+.hero-logo-showcase img{height:110px}
+.hero-stats{gap:2rem;flex-wrap:wrap;justify-content:center}
+.hero-stat .num{font-size:1.8rem}
+.promos-grid{grid-template-columns:1fr}
+.products-grid{grid-template-columns:repeat(2,1fr);gap:1rem}
+.section{padding:3rem 1.2rem}
+.section-title{font-size:2rem}
+.features-inner{flex-direction:column;align-items:center;gap:.5rem}
+.footer-inner{grid-template-columns:1fr}
+.footer-bottom{flex-direction:column;gap:.8rem;text-align:center}
+.header-inner{padding:0 1.2rem;height:70px}
+.logo-wrap img{height:48px}
+.about-values{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+.products-grid{grid-template-columns:1fr 1fr;gap:.7rem}
+.product-info{padding:.8rem 1rem 1rem}
+.product-name{font-size:1rem}
+.product-img{height:155px}
+.product-desc{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header" id="header">
+<div class="header-inner">
+<a href="#" class="logo-wrap"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 80'%3E%3Ctext x='150' y='35' text-anchor='middle' font-family='Georgia,serif' font-size='28' font-weight='bold' fill='%23C97B5A'%3EDona%3C/text%3E%3Ctext x='150' y='65' text-anchor='middle' font-family='Georgia,serif' font-size='28' font-weight='bold' fill='%23C97B5A'%3EChocolate%3C/text%3E%3C/svg%3E" alt="Dona Chocolate"></a>
+<nav class="nav" id="mainNav">
+<a href="#" class="active">Home</a>
+<a href="#promos">Packages</a>
+<a href="#menu">Collection</a>
+<a href="#instructions">Instructions</a>
+<a href="#about">About</a>
+<a href="#contact">Contact</a>
+</nav>
+<div class="header-actions">
+<div class="search-box">
+<svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+<input type="text" placeholder="Search meals..." id="searchInput" oninput="filterProducts()">
+</div>
+<button class="cart-btn" onclick="toggleCart()">🛒<span class="cart-count" id="cartCount">0</span></button>
+<button class="mobile-menu-btn" onclick="toggleMobileNav()">☰</button>
+</div>
+</div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+<div class="hero-bg"></div>
+<div class="hero-grain"></div>
+<div class="hero-inner">
+<div class="hero-logo-showcase fade-in">
+<div class="hero-logo-glow"></div>
+<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 80'%3E%3Ctext x='150' y='35' text-anchor='middle' font-family='Georgia,serif' font-size='28' font-weight='bold' fill='%23C97B5A'%3EDona%3C/text%3E%3Ctext x='150' y='65' text-anchor='middle' font-family='Georgia,serif' font-size='28' font-weight='bold' fill='%23C97B5A'%3EChocolate%3C/text%3E%3C/svg%3E" alt="Dona Chocolate">
+</div>
+<div class="hero-divider fade-in"></div>
+<h1 class="hero-tagline fade-in">Artisan Sweets<br><span>Made for Celebrations</span></h1>
+<p class="hero-sub fade-in">Exquisite handcrafted chocolates, truffles, and sweets for weddings, parties, and special celebrations. Made with love and the finest ingredients.</p>
+<div class="hero-cta fade-in">
+<a href="#menu" class="btn btn-primary">Browse Collection →</a>
+<a href="#promos" class="btn btn-outline">Special Packages</a>
+</div>
+<div class="hero-stats fade-in">
+<div class="hero-stat"><div class="num">1000+</div><div class="label">Happy Celebrations</div></div>
+<div class="hero-stat"><div class="num">50+</div><div class="label">Artisan Products</div></div>
+<div class="hero-stat"><div class="num">4.9★</div><div class="label">Avg. Rating</div></div>
+</div>
+</div>
+</section>
+
+<!-- FEATURES -->
+<div class="features-bar">
+<div class="features-inner">
+<div class="feature-item"><span class="fi">🚚</span> Delivery & Pickup Available</div>
+<div class="feature-item"><span class="fi">🍫</span> Premium Belgian Chocolate</div>
+<div class="feature-item"><span class="fi">🎀</span> Custom Gift Packaging</div>
+<div class="feature-item"><span class="fi">💒</span> Weddings & Events Specialist</div>
+</div>
+</div>
+
+<!-- PROMOS -->
+<section class="section" id="promos">
+<div class="section-header">
+<h2 class="section-title fade-in">Special <span>Packages</span></h2>
+<a href="#" class="view-all">View all →</a>
+</div>
+<div class="promos-grid">
+<div class="promo-card p1 fade-in" onclick="applyFilter('weddings')">
+<span class="promo-badge">-15%</span>
+<div class="promo-emoji">💒</div>
+<div class="promo-title">Wedding Season</div>
+<div class="promo-desc">15% off all wedding chocolate packages this month</div>
+<div class="promo-timer" data-end="2026-03-29T23:59:59"><div class="timer-unit"><span class="days">0</span><small>days</small></div><div class="timer-unit"><span class="hours">0</span><small>hrs</small></div><div class="timer-unit"><span class="mins">0</span><small>min</small></div></div>
+</div>
+<div class="promo-card p2 fade-in" onclick="applyFilter('all')">
+<span class="promo-badge combo-b">COMBO</span>
+<div class="promo-emoji">🎁</div>
+<div class="promo-title">Party Package</div>
+<div class="promo-desc">100 assorted truffles + custom packaging — special price</div>
+<div class="promo-timer" data-end="2026-04-05T23:59:59"><div class="timer-unit"><span class="days">0</span><small>days</small></div><div class="timer-unit"><span class="hours">0</span><small>hrs</small></div><div class="timer-unit"><span class="mins">0</span><small>min</small></div></div>
+</div>
+<div class="promo-card p3 fade-in" onclick="applyFilter('truffles')">
+<span class="promo-badge new-b">NEW</span>
+<div class="promo-emoji">🍫</div>
+<div class="promo-title">New Flavours</div>
+<div class="promo-desc">Discover our new pistachio, passion fruit & Earl Grey truffles</div>
+<div class="promo-timer" data-end="2026-04-12T23:59:59"><div class="timer-unit"><span class="days">0</span><small>days</small></div><div class="timer-unit"><span class="hours">0</span><small>hrs</small></div><div class="timer-unit"><span class="mins">0</span><small>min</small></div></div>
+</div>
+</div>
+</section>
+
+<!-- CATEGORIES + PRODUCTS -->
+<section class="section" id="menu" style="padding-top:2rem">
+<div class="section-header">
+<h2 class="section-title fade-in">Our <span>Collection</span></h2>
+</div>
+<div class="categories-scroll" id="catScroll"></div>
+</section>
+<section class="section" style="padding-top:1rem">
+<div class="products-container">
+<div class="products-grid" id="productsGrid"></div>
+</div>
+</section>
+
+<!-- INSTRUCTIONS -->
+<section class="section" id="instructions">
+<div class="section-header"><h2 class="section-title fade-in">How to <span>Order</span></h2></div>
+<div class="instructions-container">
+<p class="instructions-intro fade-in">Ordering your custom sweets is simple. Follow these steps to make your celebration unforgettable.</p>
+<div class="steps-grid">
+<div class="step-card fade-in">
+<div class="step-number">01</div>
+<div class="step-icon">📋</div>
+<h3>Choose Your Sweets</h3>
+<p>Browse our collection and select the products you love. Mix and match flavours, or ask us for recommendations for your event type.</p>
+</div>
+<div class="step-card fade-in">
+<div class="step-number">02</div>
+<div class="step-icon">🎨</div>
+<h3>Customise</h3>
+<p>Tell us your event details — colours, theme, quantity, and date. We'll personalise the packaging and presentation to match your vision perfectly.</p>
+</div>
+<div class="step-card fade-in">
+<div class="step-number">03</div>
+<div class="step-icon">✅</div>
+<h3>Confirm & Pay</h3>
+<p>Review your order via WhatsApp. We accept cash on delivery, bank transfer, or card payment. A 50% deposit is required for large orders.</p>
+</div>
+<div class="step-card fade-in">
+<div class="step-number">04</div>
+<div class="step-icon">🎉</div>
+<h3>Receive & Celebrate</h3>
+<p>We deliver your beautifully packaged sweets on the agreed date. Temperature-controlled delivery ensures everything arrives in perfect condition.</p>
+</div>
+</div>
+<div class="instructions-tips fade-in">
+<h4>💡 Good to Know</h4>
+<div class="tips-grid">
+<div class="tip">📅 We recommend placing orders at least 7 days in advance for custom designs</div>
+<div class="tip">🌡️ Store chocolates in a cool, dry place (16–20°C) away from sunlight</div>
+<div class="tip">🎨 Custom colours, logos, and branding available for corporate events</div>
+<div class="tip">💒 Free tasting session available for wedding orders of 200+ units</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ABOUT -->
+<section class="section" id="about" style="background:var(--black-soft)">
+<div class="section-header"><h2 class="section-title fade-in">About <span>Dona Chocolate</span></h2></div>
+<div class="about-grid">
+<div class="about-text fade-in">
+<p>Born from a passion for chocolate artistry. Every piece is handcrafted with premium Belgian chocolate and the finest ingredients, creating unforgettable moments for your most special celebrations.</p>
+<p>From intimate weddings to grand parties, we bring elegance and flavour to every event. Each creation tells a story of tradition, craft, and the pure joy of chocolate.</p>
+<div class="about-values">
+<div class="value-card"><span class="ve">🍫</span><h4>Premium Chocolate</h4><p>Finest Belgian couverture in every piece</p></div>
+<div class="value-card"><span class="ve">👩‍🍳</span><h4>Artisan-Crafted</h4><p>Hand-made by master chocolatiers</p></div>
+<div class="value-card"><span class="ve">🎀</span><h4>Custom Packaging</h4><p>Beautiful gift boxes for every occasion</p></div>
+<div class="value-card"><span class="ve">💒</span><h4>Events Specialist</h4><p>Weddings, birthdays, corporate & more</p></div>
+</div>
+</div>
+<div class="about-visual fade-in">
+<div class="about-ring"></div>
+<div class="about-ring2"></div>
+<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 80'%3E%3Ctext x='150' y='35' text-anchor='middle' font-family='Georgia,serif' font-size='28' font-weight='bold' fill='%23C97B5A'%3EDona%3C/text%3E%3Ctext x='150' y='65' text-anchor='middle' font-family='Georgia,serif' font-size='28' font-weight='bold' fill='%23C97B5A'%3EChocolate%3C/text%3E%3C/svg%3E" alt="Dona Chocolate" class="about-logo">
+</div>
+</div>
+</section>
+
+<!-- CONTACT -->
+<section class="section" id="contact">
+<div style="max-width:600px;margin:0 auto;text-align:center" class="fade-in">
+<h2 class="section-title" style="margin-bottom:1rem">Get in <span>Touch</span></h2>
+<p style="color:var(--gray-light);margin-bottom:2rem">Custom orders, wedding consultations, or special requests? Reach out on WhatsApp!</p>
+<a href="https://wa.me/5511982053854" target="_blank" class="btn btn-primary" style="font-size:1rem;padding:1rem 2.5rem">💬 Chat on WhatsApp</a>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+<div class="footer-inner">
+<div class="footer-brand">
+<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 80'%3E%3Ctext x='150' y='35' text-anchor='middle' font-family='Georgia,serif' font-size='28' font-weight='bold' fill='%23C97B5A'%3EDona%3C/text%3E%3Ctext x='150' y='65' text-anchor='middle' font-family='Georgia,serif' font-size='28' font-weight='bold' fill='%23C97B5A'%3EChocolate%3C/text%3E%3C/svg%3E" alt="Dona Chocolate">
+<p>Artisan chocolates and sweets handcrafted for weddings, parties, and special celebrations.</p>
+</div>
+<div class="footer-col"><h4>Navigation</h4><a href="#promos">Packages</a><a href="#menu">Collection</a><a href="#instructions">Instructions</a><a href="#about">About Us</a><a href="#contact">Contact</a></div>
+<div class="footer-col"><h4>Information</h4><a href="#">Delivery Policy</a><a href="#">Returns</a><a href="#">FAQ</a><a href="#">Terms</a></div>
+<div class="footer-col"><h4>Contact</h4><a href="#">📍 Location TBC</a><a href="#">📞 +55 11 98205-3854</a><a href="#">✉️ <span class="__cf_email__" data-cfemail="b6ded3dadad9f6d5c3dfc5dfd8d3d5dad9ccd3da98d5d9db">[email&#160;protected]</span></a></div>
+</div>
+<div class="footer-bottom">
+<span>© 2026 Dona Chocolate. All rights reserved.</span>
+<div class="social-links">
+<a href="#" title="Instagram">📸</a>
+<a href="#" title="Facebook">📘</a>
+<a href="#" title="WhatsApp">💬</a>
+</div>
+</div>
+</footer>
+
+<!-- CART -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+<div class="cart-header"><h2>Your <span>Cart</span></h2><button class="close-cart" onclick="toggleCart()">✕</button></div>
+<div class="cart-items" id="cartItems"><div class="cart-empty"><span class="ce">🛒</span><p>Your cart is empty</p><p style="font-size:.78rem;margin-top:.3rem;color:var(--gray)">Browse our menu and add items!</p></div></div>
+<div class="cart-footer">
+<div class="cart-subtotal"><span>Subtotal</span><span id="cartSubtotal">AED 0</span></div>
+<div class="cart-subtotal"><span>Delivery</span><span>AED 10</span></div>
+<div class="cart-total"><span>Total</span><span class="price" id="cartTotal">AED 10</span></div>
+<button class="checkout-btn" onclick="checkout()">Request Quote via WhatsApp</button>
+<div class="cart-note">Custom orders confirmed via WhatsApp</div>
+</div>
+</div>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+<div class="modal" id="productModal">
+<button class="modal-close" onclick="closeModal()">✕</button>
+<div class="modal-img" id="modalImg"></div>
+<div class="modal-body">
+<div class="modal-cat" id="modalCat"></div>
+<h2 class="modal-title" id="modalTitle"></h2>
+<p class="modal-desc" id="modalDesc"></p>
+<div class="modal-meta">
+<div class="meta-item"><span class="meta-icon">⚖️</span><div><small>Serving</small><strong id="modalServing"></strong></div></div>
+<div class="meta-item"><span class="meta-icon">🔥</span><div><small>Calories</small><strong id="modalCalories"></strong></div></div>
+<div class="meta-item"><span class="meta-icon">💰</span><div><small>Price</small><strong id="modalPrice"></strong></div></div>
+</div>
+<div class="modal-section">
+<h4>📋 Ingredients</h4>
+<p id="modalIngredients"></p>
+</div>
+<div class="modal-section">
+<h4>👨‍🍳 Preparation Instructions</h4>
+<p id="modalPrep"></p>
+</div>
+<div class="modal-actions">
+<button class="btn btn-primary modal-add-btn" id="modalAddBtn">Add to Cart</button>
+</div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+<a href="https://wa.me/5511982053854" target="_blank" class="wa-float">💬</a>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const products=[
+{id:1,name:"Classic Dark Truffle",desc:"Velvety 70% dark chocolate ganache, hand-rolled in cocoa powder",price:3.5,img:"https://images.unsplash.com/photo-1548741487-18d363dc4469?w=600&q=80",category:"truffles",badge:"popular",
+ingredients:"Belgian dark chocolate (70%), heavy cream, butter, cocoa powder, vanilla extract",
+serving:"25g (1 truffle)",calories:95,
+prep:"Serve at room temperature for the best flavour. Remove from fridge 15 min before serving. Store between 16-20°C."},
+
+{id:2,name:"Champagne Truffle",desc:"White chocolate infused with real champagne, dusted in gold",price:4.5,img:"https://images.unsplash.com/photo-1551529834-525807d6b4f3?w=600&q=80",category:"truffles",badge:"new",
+ingredients:"White chocolate, heavy cream, champagne, butter, edible gold dust, vanilla",
+serving:"25g (1 truffle)",calories:110,
+prep:"Best enjoyed chilled. Perfect pairing for celebrations and toasts. Keep refrigerated until 10 min before serving."},
+
+{id:3,name:"Pistachio Bonbon",desc:"Smooth pistachio praline in a crisp milk chocolate shell",price:4,img:"https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=600&q=80",category:"bonbons",badge:"popular",
+ingredients:"Milk chocolate, pistachio paste, hazelnut praline, cocoa butter, sea salt",
+serving:"20g (1 bonbon)",calories:85,
+prep:"Serve at room temperature. The shell should have a satisfying snap. Store in cool, dry place away from sunlight."},
+
+{id:4,name:"Salted Caramel Bonbon",desc:"Buttery caramel with fleur de sel in a dark chocolate shell",price:4,img:"https://images.unsplash.com/photo-1526081347589-7fa3cb41b4b2?w=600&q=80",category:"bonbons",
+ingredients:"Dark chocolate, sugar, butter, heavy cream, fleur de sel, vanilla, cocoa butter",
+serving:"20g (1 bonbon)",calories:90,
+prep:"Best at 18-20°C. The caramel centre should be soft and flowing. Avoid refrigeration if possible."},
+
+{id:5,name:"Wedding Favour Box (50 units)",desc:"Elegant personalised boxes with 2 truffles each for wedding favours",price:280,img:"https://images.unsplash.com/photo-1549488344-cbb6c34cf08b?w=600&q=80",category:"weddings",badge:"popular",
+ingredients:"Assorted truffles (dark, milk, white), custom ribbon, personalised card, luxury box",
+serving:"50 boxes x 2 truffles (50g each box)",calories:190,
+prep:"Order at least 14 days in advance. Free colour customisation and name printing. Tasting session included for orders over 200 units."},
+
+{id:6,name:"Wedding Chocolate Tower",desc:"Stunning 5-tier display of assorted chocolates for the dessert table",price:450,img:"https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&q=80",category:"weddings",badge:"new",
+ingredients:"200+ assorted chocolates: truffles, bonbons, pralines, chocolate-dipped strawberries, macarons",
+serving:"Serves 80-100 guests",calories:0,
+prep:"Delivered assembled on the event day. Setup included. Temperature-controlled transport. Tower stand provided on loan."},
+
+{id:7,name:"72% Single Origin Bar",desc:"Intense dark chocolate from Ecuadorian cacao, bold and fruity",price:18,img:"https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=600&q=80",category:"bars",
+ingredients:"Ecuadorian cacao beans (72%), cane sugar, cocoa butter, soy lecithin",
+serving:"80g bar",calories:410,
+prep:"Snap and enjoy. Best stored at 16-20°C. Pairs beautifully with red wine or espresso."},
+
+{id:8,name:"Milk Chocolate & Hazelnut Bar",desc:"Creamy milk chocolate loaded with roasted Piedmont hazelnuts",price:16,img:"https://images.unsplash.com/photo-1575377427642-087cf684f29d?w=600&q=80",category:"bars",badge:"popular",
+ingredients:"Milk chocolate, roasted Piedmont hazelnuts, cocoa butter, vanilla, whole milk powder",
+serving:"80g bar",calories:450,
+prep:"Enjoy at room temperature for the creamiest texture. Store in cool, dry place."},
+
+{id:9,name:"Luxury Gift Box - 12 Truffles",desc:"Hand-selected assortment in an elegant keepsake box",price:55,img:"https://images.unsplash.com/photo-1549488344-cbb6c34cf08b?w=600&q=80",category:"gifts",badge:"popular",
+ingredients:"12 assorted truffles: dark, milk, white, champagne, passion fruit, raspberry, coffee, pistachio, hazelnut, salted caramel, Earl Grey, mint",
+serving:"12 truffles (300g total)",calories:1140,
+prep:"Remove from fridge 15 min before serving. Each truffle is labelled with its flavour. Box can be reused as a keepsake."},
+
+{id:10,name:"Corporate Gift Box - 24 pieces",desc:"Branded box with logo, assorted chocolates for clients and teams",price:95,img:"https://images.unsplash.com/photo-1582176604856-e824b4736522?w=600&q=80",category:"gifts",
+ingredients:"24 assorted bonbons and truffles, custom branded box, ribbon, branded card",
+serving:"24 pieces (480g total)",calories:2280,
+prep:"Minimum order: 10 boxes. Custom logo printing on box and chocolates available. Order 21 days in advance for branding."},
+
+{id:11,name:"Chocolate Drip Cake",desc:"Rich chocolate sponge with ganache drip and fresh berries",price:120,img:"https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&q=80",category:"cakes",badge:"new",
+ingredients:"Dark chocolate, butter, eggs, flour, sugar, cocoa powder, ganache (chocolate, cream), fresh berries, gold leaf",
+serving:"Serves 12-15 slices",calories:380,
+prep:"Keep refrigerated. Remove 30 min before serving. Can be customised with message, colours, and toppers. Order 5 days in advance."},
+
+{id:12,name:"Passion Fruit Truffle",desc:"Tangy tropical ganache in a vibrant yellow shell",price:4,img:"https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=600&q=80",category:"truffles",
+ingredients:"White chocolate, passion fruit puree, butter, cocoa butter, natural yellow colouring",
+serving:"25g (1 truffle)",calories:100,
+prep:"Serve at room temperature. The tropical centre pairs perfectly with sparkling wine."},
+
+{id:13,name:"Rose & Raspberry Bonbon",desc:"Delicate rose ganache with raspberry coulis centre",price:4.5,img:"https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=600&q=80",category:"bonbons",badge:"new",
+ingredients:"Dark chocolate, raspberry puree, rose water, cream, sugar, cocoa butter, freeze-dried raspberries",
+serving:"20g (1 bonbon)",calories:80,
+prep:"Best enjoyed at 18°C. The floral and fruity notes shine when not too cold. Beautiful addition to any dessert table."},
+
+{id:14,name:"Party Truffle Box - 50 units",desc:"50 assorted truffles in a premium box for birthdays and parties",price:150,img:"https://images.unsplash.com/photo-1548741487-18d363dc4469?w=600&q=80",category:"gifts",
+ingredients:"50 assorted truffles: 10 flavours x 5 each, premium box, flavour guide card",
+serving:"50 truffles (1.25kg total)",calories:4750,
+prep:"Order 7 days in advance. Can be customised with specific flavour selections. Temperature-controlled delivery included."},
+
+{id:15,name:"Brigadeiro Box - 25 units",desc:"Classic Brazilian brigadeiros in assorted gourmet flavours",price:45,img:"https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=600&q=80",category:"truffles",badge:"popular",
+ingredients:"Condensed milk, cocoa powder, butter, chocolate sprinkles, pistachio, coconut, various toppings",
+serving:"25 brigadeiros (500g total)",calories:2250,
+prep:"Serve at room temperature. Keep in individual paper cups for easy serving. Store in fridge, remove 20 min before serving."},
+
+{id:16,name:"White Choc & Matcha Bar",desc:"Creamy white chocolate layered with premium Japanese matcha",price:18,img:"https://images.unsplash.com/photo-1587132137056-bfbf0166836e?w=600&q=80",category:"bars",
+ingredients:"White chocolate, Japanese ceremonial matcha, cocoa butter, whole milk powder, vanilla",
+serving:"80g bar",calories:430,
+prep:"Enjoy at room temperature. The matcha flavour intensifies as it melts. Pairs beautifully with green tea."},
+
+{id:17,name:"Chocolate-Dipped Strawberries (12)",desc:"Fresh strawberries dipped in Belgian chocolate with toppings",price:55,img:"https://images.unsplash.com/photo-1603532648955-039310d9ed75?w=600&q=80",category:"cakes",
+ingredients:"Fresh strawberries, Belgian dark/milk/white chocolate, crushed pistachios, coconut flakes, edible gold, sprinkles",
+serving:"12 strawberries",calories:720,
+prep:"Consume within 24 hours. Keep refrigerated until 15 min before serving. Perfect for romantic occasions and dessert tables."},
+
+{id:18,name:"Earl Grey Truffle",desc:"Bergamot-infused dark chocolate ganache with a subtle tea finish",price:4,img:"https://images.unsplash.com/photo-1551529834-525807d6b4f3?w=600&q=80",category:"truffles",
+ingredients:"Dark chocolate (65%), heavy cream, Earl Grey tea leaves, butter, cocoa powder",
+serving:"25g (1 truffle)",calories:90,
+prep:"Serve at room temperature. The tea aroma is released as it melts. An elegant after-dinner treat."},
+
+{id:19,name:"Mini Dessert Table Package",desc:"50 assorted mini desserts: brownies, tarts, macarons and truffles",price:220,img:"https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&q=80",category:"cakes",badge:"popular",
+ingredients:"Mini brownies, chocolate tarts, French macarons, assorted truffles, chocolate cups with mousse",
+serving:"50 pieces, serves 25-30 guests",calories:0,
+prep:"Order 7 days in advance. Delivered on platters ready to display. Customise flavours and quantities to your preference."},
+
+{id:20,name:"Ruby Chocolate Bonbon",desc:"Fruity berry notes in stunning pink ruby chocolate shell",price:5,img:"https://images.unsplash.com/photo-1526081347589-7fa3cb41b4b2?w=600&q=80",category:"bonbons",badge:"new",
+ingredients:"Ruby chocolate, white chocolate, freeze-dried raspberries, cream, cocoa butter, citric acid",
+serving:"20g (1 bonbon)",calories:88,
+prep:"Serve at 18°C. The natural pink colour and berry flavour make it a stunning addition to any celebration. No artificial colours."}
+];
+
+const categories=[
+{id:'all',name:'All',emoji:'🍫'},
+{id:'truffles',name:'Truffles',emoji:'🟤'},
+{id:'bonbons',name:'Bonbons',emoji:'🍬'},
+{id:'weddings',name:'Weddings',emoji:'💒'},
+{id:'bars',name:'Bars & Tablets',emoji:'🍫'},
+{id:'gifts',name:'Gift Boxes',emoji:'🎁'},
+{id:'cakes',name:'Cakes & Desserts',emoji:'🎂'}
+];
+
+let cart=[],activeCategory='all';
+
+function renderCategories(){
+document.getElementById('catScroll').innerHTML=categories.map(c=>`<div class="cat-pill ${c.id===activeCategory?'active':''}" onclick="applyFilter('${c.id}')"><span class="ce">${c.emoji}</span>${c.name}</div>`).join('');
+}
+
+function renderProducts(list){
+const g=document.getElementById('productsGrid');
+g.innerHTML=list.map(p=>{
+const ic=cart.find(i=>i.id===p.id);
+const badge=p.badge==='sale'?'<span class="product-badge badge-sale">SALE</span>':p.badge==='new'?'<span class="product-badge badge-new">NEW</span>':p.badge==='popular'?'<span class="product-badge badge-popular">★ POPULAR</span>':'';
+const btn=ic?`<div class="qty-controls"><button class="qty-btn minus" onclick="event.stopPropagation();changeQty(${p.id},-1)">−</button><span class="qty-num">${ic.qty}</span><button class="qty-btn plus" onclick="event.stopPropagation();changeQty(${p.id},1)">+</button></div>`:`<button class="add-btn" onclick="event.stopPropagation();addToCart(${p.id})">+</button>`;
+return`<div class="product-card fade-in" onclick="openModal(${p.id})" style="cursor:pointer">${badge}<div class="product-img"><img src="${p.img}" alt="${p.name}" loading="lazy"></div><div class="product-info"><div class="product-cat">${p.category}</div><div class="product-name">${p.name}</div><div class="product-desc">${p.desc}</div><div class="product-bottom"><div class="product-price">AED ${p.price}</div>${btn}</div></div></div>`;
+}).join('');
+requestAnimationFrame(()=>{document.querySelectorAll('.product-card.fade-in').forEach((el,i)=>{setTimeout(()=>el.classList.add('visible'),i*50)})});
+}
+
+function applyFilter(cat){activeCategory=cat;renderCategories();const f=cat==='all'?products:products.filter(p=>p.category===cat);renderProducts(f);document.getElementById('menu').scrollIntoView({behavior:'smooth'})}
+
+function filterProducts(){
+const q=document.getElementById('searchInput').value.toLowerCase();
+const f=products.filter(p=>(activeCategory==='all'||p.category===activeCategory)&&(p.name.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q)||p.category.toLowerCase().includes(q)));
+renderProducts(f);
+}
+
+function addToCart(id){const p=products.find(x=>x.id===id);const e=cart.find(x=>x.id===id);if(e)e.qty++;else cart.push({...p,qty:1});updateCart();showToast(`✓ ${p.name} added to cart`)}
+function changeQty(id,d){const i=cart.find(x=>x.id===id);if(!i)return;i.qty+=d;if(i.qty<=0)cart=cart.filter(x=>x.id!==id);updateCart()}
+function removeFromCart(id){cart=cart.filter(x=>x.id!==id);updateCart()}
+
+function updateCart(){
+const c=cart.reduce((s,i)=>s+i.qty,0),sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
+document.getElementById('cartCount').textContent=c;
+document.getElementById('cartSubtotal').textContent=`AED ${sub}`;
+document.getElementById('cartTotal').textContent=`AED ${sub+(c>0?10:0)}`;
+renderCartItems();
+const q=document.getElementById('searchInput').value.toLowerCase();
+const f=products.filter(p=>(activeCategory==='all'||p.category===activeCategory)&&(p.name.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q)||p.category.toLowerCase().includes(q)));
+renderProducts(f);
+}
+
+function renderCartItems(){
+const el=document.getElementById('cartItems');
+if(!cart.length){el.innerHTML='<div class="cart-empty"><span class="ce">🛒</span><p>Your cart is empty</p><p style="font-size:.78rem;margin-top:.3rem;color:var(--gray)">Browse our menu and add items!</p></div>';return}
+el.innerHTML=cart.map(i=>`<div class="cart-item"><div class="cart-item-img"><img src="${i.img}" alt="${i.name}"></div><div class="cart-item-info"><div class="cart-item-name">${i.name}</div><div class="cart-item-price">AED ${i.price*i.qty}</div><div class="cart-item-controls"><button class="qty-btn minus" onclick="changeQty(${i.id},-1)">−</button><span class="qty-num">${i.qty}</span><button class="qty-btn plus" onclick="changeQty(${i.id},1)">+</button><button class="cart-item-remove" onclick="removeFromCart(${i.id})">✕ Remove</button></div></div></div>`).join('');
+}
+
+function toggleCart(){document.getElementById('cartOverlay').classList.toggle('open');document.getElementById('cartSidebar').classList.toggle('open')}
+
+function checkout(){
+if(!cart.length){showToast('Your cart is empty!');return}
+const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
+let msg='🍫 *Dona Chocolate Order*\n\n';
+cart.forEach(i=>{msg+=`• ${i.name} x${i.qty} — AED ${i.price*i.qty}\n`});
+msg+=`\n💰 Subtotal: AED ${sub}\n🚚 Delivery: AED 10\n*Total: AED ${sub+10}*`;
+window.open(`https://wa.me/5511982053854?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+function showToast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
+
+let currentModalProduct=null;
+function openModal(id){
+const p=products.find(x=>x.id===id);
+if(!p)return;
+currentModalProduct=p;
+document.getElementById('modalImg').innerHTML=`<img src="${p.img}" alt="${p.name}">`;
+document.getElementById('modalCat').textContent=p.category;
+document.getElementById('modalTitle').textContent=p.name;
+document.getElementById('modalDesc').textContent=p.desc;
+document.getElementById('modalServing').textContent=p.serving||'—';
+document.getElementById('modalCalories').textContent=p.calories?p.calories+' kcal':'—';
+document.getElementById('modalPrice').textContent='AED '+p.price;
+document.getElementById('modalIngredients').textContent=p.ingredients||'—';
+document.getElementById('modalPrep').textContent=p.prep||'—';
+const ic=cart.find(i=>i.id===p.id);
+const actionsEl=document.querySelector('.modal-actions');
+if(ic){
+actionsEl.innerHTML=`<div class="modal-qty-wrap"><button class="qty-btn minus" onclick="changeQty(${p.id},-1);refreshModalActions(${p.id})">−</button><span class="qty-num">${ic.qty}</span><button class="qty-btn plus" onclick="changeQty(${p.id},1);refreshModalActions(${p.id})">+</button></div><button class="btn btn-primary modal-add-btn" onclick="closeModal()">Continue Shopping</button>`;
+}else{
+actionsEl.innerHTML=`<button class="btn btn-primary modal-add-btn" onclick="addToCart(${p.id});refreshModalActions(${p.id})">Add to Cart — AED ${p.price}</button>`;
+}
+document.getElementById('modalOverlay').classList.add('open');
+document.getElementById('productModal').classList.add('open');
+document.body.style.overflow='hidden';
+}
+function refreshModalActions(id){
+const p=products.find(x=>x.id===id);
+const ic=cart.find(i=>i.id===id);
+const actionsEl=document.querySelector('.modal-actions');
+if(ic){
+actionsEl.innerHTML=`<div class="modal-qty-wrap"><button class="qty-btn minus" onclick="changeQty(${id},-1);refreshModalActions(${id})">−</button><span class="qty-num">${ic.qty}</span><button class="qty-btn plus" onclick="changeQty(${id},1);refreshModalActions(${id})">+</button></div><button class="btn btn-primary modal-add-btn" onclick="closeModal()">Continue Shopping</button>`;
+}else{
+actionsEl.innerHTML=`<button class="btn btn-primary modal-add-btn" onclick="addToCart(${id});refreshModalActions(${id})">Add to Cart — AED ${p.price}</button>`;
+}
+}
+function closeModal(){
+document.getElementById('modalOverlay').classList.remove('open');
+document.getElementById('productModal').classList.remove('open');
+document.body.style.overflow='';
+currentModalProduct=null;
+}
+
+function toggleMobileNav(){
+const n=document.getElementById('mainNav');
+if(n.style.display==='flex'){n.style.display='none';return}
+n.style.display='flex';n.style.position='absolute';n.style.top='70px';n.style.left='0';n.style.right='0';
+n.style.background='rgba(10,10,10,.96)';n.style.flexDirection='column';n.style.padding='1.5rem 2rem';
+n.style.borderBottom='1px solid var(--gray-dark)';n.style.backdropFilter='blur(20px)';
+}
+
+function updateTimers(){
+document.querySelectorAll('.promo-timer').forEach(el=>{
+const diff=Math.max(0,new Date(el.dataset.end).getTime()-Date.now());
+el.querySelector('.days').textContent=Math.floor(diff/864e5);
+el.querySelector('.hours').textContent=Math.floor((diff%864e5)/36e5);
+el.querySelector('.mins').textContent=Math.floor((diff%36e5)/6e4);
+})}
+
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:.1});
+
+renderCategories();renderProducts(products);updateTimers();setInterval(updateTimers,6e4);
+setTimeout(()=>{document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el))},100);
+
+window.addEventListener('scroll',()=>{
+document.getElementById('header').style.boxShadow=window.scrollY>50?'0 4px 24px rgba(0,0,0,.5)':'none';
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();if(document.getElementById('cartSidebar').classList.contains('open'))toggleCart()}});
+</script>
+</body>
+</html>
