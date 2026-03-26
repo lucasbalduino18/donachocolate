@@ -1402,9 +1402,9 @@ function saveBill(id,mode){
         if(rec==='weekly')dt.setDate(dt.getDate()+i*7);
         else if(rec==='monthly')dt.setMonth(dt.getMonth()+i);
         else if(rec==='yearly')dt.setFullYear(dt.getFullYear()+i);
-        const dd={...d,due_date:dt.toISOString().split('T')[0],recurrence:rec,recurrence_group:group};
+        const dd={...d,due_date:dt.toISOString().split('T')[0],recurrence:rec,recurrence_group:group,id:Date.now()+i,created_at:new Date().toISOString()};
         if(i>0)dd.status='pending';
-        DB.addBill(dd);
+        const bills=DB.getBills();bills.push(dd);DB.saveBills(bills);
       }
       toast(recN+' contas criadas!');
     }else{
