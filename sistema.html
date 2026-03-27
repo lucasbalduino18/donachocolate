@@ -1567,11 +1567,26 @@ ${Object.entries(prodTotals).sort((a,b)=>b[1]-a[1]).map(([name,qty])=>`<div clas
 <table>
 <thead><tr><th>Cliente / Produto</th><th style="width:60px;text-align:left">Qtd.</th><th style="text-align:right">Entrega</th></tr></thead>
 <tbody>
-${orders.sort((a,b)=>(a.event_date||'').localeCompare(b.event_date||'')).map(o=>{
-  const tqty=(o.items||[]).reduce((s,i)=>s+i.qty,0);
-  return'<tr class="client-row"><td>'+o.customer_name+' <span style="font-weight:400;color:#888">('+o.number+')</span></td><td style="text-align:left"><strong style="color:#A6604A">'+tqty+'</strong></td><td style="text-align:right">'+fmtDate(o.event_date)+'</td></tr>'
-  +(o.items||[]).map(i=>'<tr class="item-row"><td>'+i.name+(i.desc?'<div style="font-size:.72rem;color:#888;margin-top:.1rem">'+i.desc+'</div>':'')+'</td><td style="text-align:left"><strong>'+i.qty+'</strong></td><td></td></tr>').join('');
-}).join('')}
+${(()=>{
+  const grouped={};
+  orders.forEach(o=>{
+    const key=o.customer_name;
+    if(!grouped[key])grouped[key]={name:key,orders:[],totalQty:0};
+    grouped[key].orders.push(o);
+    grouped[key].totalQty+=(o.items||[]).reduce((s,i)=>s+i.qty,0);
+  });
+  return Object.values(grouped).sort((a,b)=>a.name.localeCompare(b.name)).map(g=>{
+    let html='<tr class="client-row"><td><strong>'+g.name+'</strong></td><td style="text-align:left"><strong style="color:#A6604A">'+g.totalQty+'</strong></td><td></td></tr>';
+    g.orders.sort((a,b)=>(a.event_date||'').localeCompare(b.event_date||'')).forEach(o=>{
+      const tqty=(o.items||[]).reduce((s,i)=>s+i.qty,0);
+      html+='<tr><td style="padding-left:1.2rem;font-size:.82rem;color:#666;border-bottom:1px solid #e8e0d6">'+o.number+' <span style="color:#aaa">— '+fmtDate(o.event_date)+'</span></td><td style="text-align:left;font-size:.82rem;color:#666;border-bottom:1px solid #e8e0d6">'+tqty+'</td><td style="text-align:right;font-size:.82rem;color:#aaa;border-bottom:1px solid #e8e0d6">'+fmtDate(o.event_date)+'</td></tr>';
+      (o.items||[]).forEach(i=>{
+        html+='<tr class="item-row"><td>'+i.name+(i.desc?'<div style="font-size:.72rem;color:#888;margin-top:.1rem">'+i.desc+'</div>':'')+'</td><td style="text-align:left"><strong>'+i.qty+'</strong></td><td></td></tr>';
+      });
+    });
+    return html;
+  }).join('');
+})()}
 <tr class="total-row"><td>TOTAL</td><td style="text-align:left"><strong style="color:#A6604A">${totalQty}</strong></td><td></td></tr>
 </tbody></table>
 </body></html>`);
@@ -1595,11 +1610,11 @@ function openOrderModal(id){
 }
 function filterCustDD(){
   const q=(document.getElementById('oCSearch')?.value||'').toLowerCase();
-  const cs=DB.getCustomers().filter(c=>!q||c.name.toLowerCase().includes(q));
+  const cs=DB.getCustomers().filter(c=>!q||c.name.toLowerCase().includes(q)).sort((a,b)=>{const ao=a.total_orders||0,bo=b.total_orders||0;if(bo!==ao)return bo-ao;return a.name.localeCompare(b.name)});
   const dd=document.getElementById('oCDD');if(!dd)return;
   dd.style.display='block';
   dd.innerHTML='<div style="padding:.5rem .8rem;cursor:pointer;font-size:.82rem;color:var(--copper);font-weight:600;border-bottom:1px solid var(--border-active);background:var(--copper-glow)" onmousedown="toggleNewCust(true)" onmouseover="this.style.background=\'rgba(201,123,90,.18)\'" onmouseout="this.style.background=\'var(--copper-glow)\'">+ Novo Cliente</div>'
-    +cs.map(c=>'<div style="padding:.5rem .8rem;cursor:pointer;font-size:.82rem;border-bottom:1px solid var(--border);transition:background .15s" onmousedown="pickCust('+c.id+',\''+c.name.replace(/'/g,"\\'")+'\')" onmouseover="this.style.background=\'var(--surface-hover)\'" onmouseout="this.style.background=\'none\'"><strong>'+c.name+'</strong><span style="float:right;font-size:.68rem;color:var(--text-muted)">'+(c.type==='corporate'?'🏢':'👤')+'</span></div>').join('');
+    +cs.slice(0,30).map(c=>'<div style="padding:.5rem .8rem;cursor:pointer;font-size:.82rem;border-bottom:1px solid var(--border);transition:background .15s" onmousedown="pickCust('+c.id+',\''+c.name.replace(/'/g,"\\'")+'\')" onmouseover="this.style.background=\'var(--surface-hover)\'" onmouseout="this.style.background=\'none\'"><strong>'+c.name+'</strong><span style="float:right;font-size:.68rem;color:var(--text-muted)">'+(c.total_orders?c.total_orders+' ped · ':'')+(c.type==='corporate'?'🏢':'👤')+'</span></div>').join('');
 }
 function pickCust(id,name){document.getElementById('oC').value=id;document.getElementById('oCSearch').value=name;document.getElementById('oCDD').style.display='none';setTimeout(()=>{const el=document.getElementById('oED');if(el)el.focus()},50)}
 function closeCustDD(e){const dd=document.getElementById('oCDD');if(dd&&!dd.contains(e.target)&&e.target.id!=='oCSearch')dd.style.display='none'}
