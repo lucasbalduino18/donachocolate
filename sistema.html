@@ -1758,15 +1758,53 @@ function saveCu(id){const d={name:document.getElementById('cuN').value.trim(),em
 function delCu(id){DB.deleteCustomer(id);toast('Excluído');renderCustomers(document.getElementById('content'))}
 
 // ===== FINANCE =====
+let finFilter='month';let finDtI='';let finDtF='';
 function renderFinance(c){
+  const now=new Date();const curY=now.getFullYear();const curM=now.getMonth();
+  // Date range based on filter
+  let dtStart='',dtEnd='';
+  if(finFilter==='month'){dtStart=curY+'-'+String(curM+1).padStart(2,'0')+'-01';dtEnd=curY+'-'+String(curM+1).padStart(2,'0')+'-'+String(new Date(curY,curM+1,0).getDate()).padStart(2,'0')}
+  else if(finFilter==='year'){dtStart=curY+'-01-01';dtEnd=curY+'-12-31'}
+  else if(finFilter==='custom'){dtStart=finDtI;dtEnd=finDtF}
+  function inRange(d){if(!d)return !dtStart;if(dtStart&&d<dtStart)return false;if(dtEnd&&d>dtEnd)return false;return true}
   const o=DB.getOrders(),ps=DB.getProducts(),bs=DB.getBills();
-  const comp=o.filter(x=>x.status==='completed'),rev=comp.reduce((s,x)=>s+x.total,0);
-  const pRev=o.filter(x=>x.status==='pending'||x.status==='processing').reduce((s,x)=>s+x.total,0);
-  const bPd=bs.filter(x=>x.status==='paid').reduce((s,x)=>s+x.amount,0);
-  const bPe=bs.filter(x=>x.status!=='paid').reduce((s,x)=>s+x.amount,0);
-  c.innerHTML='<div class="stats-row"><div class="stat-card"><div class="stat-icon green">💵</div><div class="stat-label">Receita</div><div class="stat-value">'+fmt(rev)+'</div></div><div class="stat-card"><div class="stat-icon orange">⏳</div><div class="stat-label">A Receber</div><div class="stat-value">'+fmt(pRev)+'</div></div><div class="stat-card"><div class="stat-icon copper">💸</div><div class="stat-label">Contas Pagas</div><div class="stat-value">'+fmt(bPd)+'</div></div><div class="stat-card"><div class="stat-icon blue">📊</div><div class="stat-label">Contas Pend.</div><div class="stat-value">'+fmt(bPe)+'</div></div></div>'
-    +'<div class="panel"><div class="panel-header"><div class="panel-title">Receita por <span>Categoria</span></div></div><div class="panel-body">'+(()=>{const cr={};o.filter(x=>x.status!=='cancelled').forEach(x=>{(x.items||[]).forEach(i=>{const p=ps.find(y=>y.id===i.product_id);cr[p?.category||'outros']=(cr[p?.category||'outros']||0)+i.price*i.qty})});const mx=Math.max(...Object.values(cr),1);return Object.entries(cr).sort((a,b)=>b[1]-a[1]).map(([cat,val])=>'<div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.6rem"><span style="width:30px;text-align:center">'+getCatEmoji(cat)+'</span><span style="width:110px;font-size:.82rem;font-weight:600">'+getCatName(cat)+'</span><div style="flex:1;height:24px;background:var(--surface);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+val/mx*100+'%;background:linear-gradient(90deg,var(--copper),var(--copper-light));border-radius:4px"></div></div><span style="font-size:.82rem;font-weight:700;min-width:80px;text-align:right">'+fmt(val)+'</span></div>').join('')})()+'</div></div>';
+  const fOrd=o.filter(x=>inRange(x.event_date));
+  const fBills=bs.filter(x=>inRange(x.due_date));
+  const comp=fOrd.filter(x=>x.status==='completed'),rev=comp.reduce((s,x)=>s+x.total,0);
+  const pRev=fOrd.filter(x=>x.status==='pending'||x.status==='processing').reduce((s,x)=>s+x.total,0);
+  const bPd=fBills.filter(x=>x.status==='paid').reduce((s,x)=>s+x.amount,0);
+  const bPe=fBills.filter(x=>x.status!=='paid').reduce((s,x)=>s+x.amount,0);
+  const catLabels={materia_prima:'Matéria Prima',aluguel:'Aluguel',embalagem:'Embalagem',utilidade:'Utilidades',logistica:'Logística',outros:'Outros'};
+  const catEmojis={materia_prima:'🍫',aluguel:'🏠',embalagem:'📦',utilidade:'💡',logistica:'🚚',outros:'📌'};
+  // Expenses by category
+  const expByCat={};
+  fBills.forEach(b=>{const cat=b.category||'outros';expByCat[cat]=(expByCat[cat]||0)+b.amount});
+  const expTotal=Object.values(expByCat).reduce((s,v)=>s+v,0);
+  const expMax=Math.max(...Object.values(expByCat),1);
+  // Revenue by product category
+  const revByCat={};
+  fOrd.filter(x=>x.status!=='cancelled').forEach(x=>{(x.items||[]).forEach(i=>{const p=ps.find(y=>y.id===i.product_id);revByCat[p?.category||'outros']=(revByCat[p?.category||'outros']||0)+i.price*i.qty})});
+  const revMax=Math.max(...Object.values(revByCat),1);
+  // Period label
+  const ms=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  let periodLabel=finFilter==='month'?ms[curM]+' '+curY:finFilter==='year'?'Ano '+curY:finDtI&&finDtF?fmtDate(finDtI)+' a '+fmtDate(finDtF):'Período personalizado';
+
+  c.innerHTML='<div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem">'
+    +'<button class="btn btn-sm '+(finFilter==='month'?'btn-primary':'btn-secondary')+'" onclick="setFinFilter(\'month\')">Este Mês</button>'
+    +'<button class="btn btn-sm '+(finFilter==='year'?'btn-primary':'btn-secondary')+'" onclick="setFinFilter(\'year\')">Este Ano</button>'
+    +'<button class="btn btn-sm '+(finFilter==='custom'?'btn-primary':'btn-secondary')+'" onclick="setFinFilter(\'custom\')">Personalizado</button>'
+    +(finFilter==='custom'?'<div style="display:flex;align-items:center;gap:.3rem"><label style="font-size:.65rem;font-weight:600;color:var(--text-muted)">De</label><input type="date" id="finDtI" value="'+finDtI+'" onchange="finDtI=this.value;renderFinance(document.getElementById(\'content\'))" style="min-width:130px"></div><div style="display:flex;align-items:center;gap:.3rem"><label style="font-size:.65rem;font-weight:600;color:var(--text-muted)">Até</label><input type="date" id="finDtF" value="'+finDtF+'" onchange="finDtF=this.value;renderFinance(document.getElementById(\'content\'))" style="min-width:130px"></div>':'')
+    +'<span style="margin-left:auto;font-size:.82rem;color:var(--text-muted)">'+periodLabel+'</span></div>'
+    +'<div class="stats-row"><div class="stat-card"><div class="stat-icon green">💵</div><div class="stat-label">Receita</div><div class="stat-value">'+fmt(rev)+'</div></div><div class="stat-card"><div class="stat-icon orange">⏳</div><div class="stat-label">A Receber</div><div class="stat-value">'+fmt(pRev)+'</div></div><div class="stat-card"><div class="stat-icon copper">💸</div><div class="stat-label">Contas Pagas</div><div class="stat-value">'+fmt(bPd)+'</div></div><div class="stat-card"><div class="stat-icon blue">📊</div><div class="stat-label">Contas Pend.</div><div class="stat-value">'+fmt(bPe)+'</div></div></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem" class="dash-tables">'
+    +'<div class="panel"><div class="panel-header"><div class="panel-title">Receita por <span>Categoria</span></div></div><div class="panel-body">'
+    +(Object.keys(revByCat).length?Object.entries(revByCat).sort((a,b)=>b[1]-a[1]).map(([cat,val])=>'<div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.6rem"><span style="width:30px;text-align:center">'+getCatEmoji(cat)+'</span><span style="width:110px;font-size:.82rem;font-weight:600">'+getCatName(cat)+'</span><div style="flex:1;height:24px;background:var(--surface);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+val/revMax*100+'%;background:linear-gradient(90deg,var(--copper),var(--copper-light));border-radius:4px"></div></div><span style="font-size:.82rem;font-weight:700;min-width:80px;text-align:right">'+fmt(val)+'</span></div>').join(''):'<div style="text-align:center;padding:1.5rem;color:var(--text-muted);font-size:.82rem">Sem dados no período</div>')
+    +'</div></div>'
+    +'<div class="panel"><div class="panel-header"><div class="panel-title">Despesas por <span>Categoria</span></div></div><div class="panel-body">'
+    +(Object.keys(expByCat).length?Object.entries(expByCat).sort((a,b)=>b[1]-a[1]).map(([cat,val])=>'<div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.6rem"><span style="width:30px;text-align:center">'+(catEmojis[cat]||'📌')+'</span><span style="width:110px;font-size:.82rem;font-weight:600">'+(catLabels[cat]||cat)+'</span><div style="flex:1;height:24px;background:var(--surface);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+val/expMax*100+'%;background:linear-gradient(90deg,var(--danger),#E57373);border-radius:4px"></div></div><span style="font-size:.82rem;font-weight:700;min-width:80px;text-align:right">'+fmt(val)+'</span></div>').join('')+'<div style="display:flex;justify-content:space-between;padding:.6rem 0 0;margin-top:.4rem;border-top:1px solid var(--border);font-weight:700;font-size:.9rem"><span>Total</span><span style="color:var(--danger)">'+fmt(expTotal)+'</span></div>':'<div style="text-align:center;padding:1.5rem;color:var(--text-muted);font-size:.82rem">Sem despesas no período</div>')
+    +'</div></div></div>';
 }
+function setFinFilter(f){finFilter=f;renderFinance(document.getElementById('content'))}
 
 // ===== SETTINGS =====
 function renderSettings(c){
