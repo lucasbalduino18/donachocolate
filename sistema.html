@@ -1140,7 +1140,22 @@ let currentPage='dashboard',calYear,calMonth,calSelectedDate;
 const today=new Date();calYear=today.getFullYear();calMonth=today.getMonth();calSelectedDate=today.toISOString().split('T')[0];
 
 function navigate(p){currentPage=p;document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.dataset.page===p));closeSidebar();renderPage()}
+function recalcCustomerStats(){
+  const orders=DB.getOrders();const custs=DB.getCustomers();
+  const statsById={};const statsByName={};
+  orders.forEach(o=>{
+    if(o.customer_id){if(!statsById[o.customer_id])statsById[o.customer_id]={count:0,spent:0};statsById[o.customer_id].count++;statsById[o.customer_id].spent+=o.total||0}
+    if(o.customer_name){const n=o.customer_name.toLowerCase();if(!statsByName[n])statsByName[n]={count:0,spent:0};statsByName[n].count++;statsByName[n].spent+=o.total||0}
+  });
+  let changed=false;
+  custs.forEach(c=>{
+    const s=statsById[c.id]||statsByName[(c.name||'').toLowerCase()]||{count:0,spent:0};
+    if(c.total_orders!==s.count||c.total_spent!==s.spent){c.total_orders=s.count;c.total_spent=s.spent;changed=true}
+  });
+  if(changed)DB.saveCustomers(custs);
+}
 function renderPage(){
+  recalcCustomerStats();
   const c=document.getElementById('content');
   const t={dashboard:'📅 <span>Agenda</span>',orders:'Gestão de <span>Pedidos</span>',products:'Catálogo de <span>Produtos</span>',categories:'<span>Categorias</span>',customers:'Base de <span>Clientes</span>',finance:'Painel <span>Financeiro</span>',settings:'<span>Configurações</span>',appointments:'<span>Compromissos</span>',bills:'Contas a <span>Pagar</span>'};
   document.getElementById('pageTitle').innerHTML=t[currentPage]||'';
