@@ -1365,22 +1365,25 @@ function fBT(){
 function openBillModal(id){
   const b=id?DB.getBills().find(x=>x.id===id):null;
   const isRecurring=b?.recurrence_group;
-  openModal('<div class="modal-box-header"><h3>'+(b?'Editar':'Nova')+' Conta</h3><button onclick="closeModal()" style="font-size:1.2rem;color:var(--text-muted)">✕</button></div><div class="modal-box-body"><div class="form-group"><label>Título</label><input id="bT" value="'+(b?.title||'')+'"></div><div class="form-group"><label>Descrição</label><textarea id="bD">'+(b?.desc||'')+'</textarea></div><div class="form-row"><div class="form-group"><label>Valor</label><input type="number" step="0.01" id="bA" value="'+(b?.amount||'')+'"></div><div class="form-group"><label>Vencimento</label><input type="date" id="bDu" value="'+(b?.due_date||calSelectedDate||'')+'"></div></div><div class="form-row"><div class="form-group"><label>Categoria</label><select id="bC"><option value="materia_prima" '+(b?.category==='materia_prima'?'selected':'')+'>Matéria Prima</option><option value="aluguel" '+(b?.category==='aluguel'?'selected':'')+'>Aluguel</option><option value="embalagem" '+(b?.category==='embalagem'?'selected':'')+'>Embalagem</option><option value="utilidade" '+(b?.category==='utilidade'?'selected':'')+'>Utilidades</option><option value="logistica" '+(b?.category==='logistica'?'selected':'')+'>Logística</option><option value="outros" '+(b?.category==='outros'?'selected':'')+'>Outros</option></select></div><div class="form-group"><label>Status</label><select id="bS"><option value="pending" '+(b?.status==='pending'?'selected':'')+'>Pendente</option><option value="paid" '+(b?.status==='paid'?'selected':'')+'>Pago</option><option value="overdue" '+(b?.status==='overdue'?'selected':'')+'>Vencida</option></select></div></div>'
+  openModal('<div class="modal-box-header"><h3>'+(b?'Editar':'Nova')+' Conta</h3><button onclick="closeModal()" style="font-size:1.2rem;color:var(--text-muted)">✕</button></div><div class="modal-box-body"><input type="hidden" id="bId" value="'+(id||'')+'"><div class="form-group"><label>Título</label><input id="bT" value="'+(b?.title||'')+'"></div><div class="form-group"><label>Descrição</label><textarea id="bD">'+(b?.desc||'')+'</textarea></div><div class="form-row"><div class="form-group"><label>Valor</label><input type="number" step="0.01" id="bA" value="'+(b?.amount||'')+'"></div><div class="form-group"><label>Vencimento</label><input type="date" id="bDu" value="'+(b?.due_date||calSelectedDate||'')+'"></div></div><div class="form-row"><div class="form-group"><label>Categoria</label><select id="bC"><option value="materia_prima" '+(b?.category==='materia_prima'?'selected':'')+'>Matéria Prima</option><option value="aluguel" '+(b?.category==='aluguel'?'selected':'')+'>Aluguel</option><option value="embalagem" '+(b?.category==='embalagem'?'selected':'')+'>Embalagem</option><option value="utilidade" '+(b?.category==='utilidade'?'selected':'')+'>Utilidades</option><option value="logistica" '+(b?.category==='logistica'?'selected':'')+'>Logística</option><option value="outros" '+(b?.category==='outros'?'selected':'')+'>Outros</option></select></div><div class="form-group"><label>Status</label><select id="bS"><option value="pending" '+(b?.status==='pending'?'selected':'')+'>Pendente</option><option value="paid" '+(b?.status==='paid'?'selected':'')+'>Pago</option><option value="overdue" '+(b?.status==='overdue'?'selected':'')+'>Vencida</option></select></div></div>'
     +(!id?'<div class="form-row"><div class="form-group"><label>Recorrência</label><select id="bRec"><option value="">Nenhuma (única)</option><option value="weekly">Semanal</option><option value="monthly">Mensal</option><option value="yearly">Anual</option></select></div><div class="form-group"><label>Repetir por</label><input type="number" id="bRecN" value="12" min="2" max="60" placeholder="Nº de vezes"></div></div>':'')
     +(isRecurring?'<div style="background:var(--surface);border-radius:var(--radius-sm);padding:.8rem;margin-top:.5rem;font-size:.82rem"><strong>🔄 Conta recorrente</strong><span style="color:var(--text-muted);margin-left:.5rem">'+(b.recurrence==='weekly'?'Semanal':b.recurrence==='monthly'?'Mensal':'Anual')+'</span></div>':'')
     +'</div><div class="modal-box-footer">'
-    +(isRecurring?'<button class="btn btn-secondary" onclick="saveBill('+id+',\'all\')">Salvar todas futuras</button><button class="btn btn-primary" onclick="saveBill('+id+',\'single\')">Salvar apenas esta</button>':'<button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveBill('+(id||'null')+',\'single\')">Salvar</button>')
+    +(isRecurring?'<button class="btn btn-secondary" onclick="saveBillModal(\'all\')">Salvar todas futuras</button><button class="btn btn-primary" onclick="saveBillModal(\'single\')">Salvar apenas esta</button>':'<button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveBillModal(\'single\')">Salvar</button>')
     +'</div>');
   if(!id)setTimeout(()=>{const el=document.getElementById('bT');if(el)el.focus()},100);
 }
-function saveBill(id,mode){
+function saveBillModal(mode){
+  const idStr=document.getElementById('bId')?.value||'';
+  const id=idStr?Number(idStr):null;
   const d={title:document.getElementById('bT').value.trim(),desc:document.getElementById('bD').value.trim(),amount:parseFloat(document.getElementById('bA').value)||0,due_date:document.getElementById('bDu').value,category:document.getElementById('bC').value,status:document.getElementById('bS').value};
   if(!d.title){toast('Título obrigatório','error');return}
   if(id){
-    const orig=DB.getBills().find(x=>x.id===id);
-    if(mode==='all'&&orig?.recurrence_group){
-      // Update all future bills in the same recurrence group
-      const bills=DB.getBills();
+    const bills=DB.getBills();
+    const origIdx=bills.findIndex(x=>x.id===id);
+    if(origIdx<0){toast('Conta não encontrada','error');return}
+    const orig=bills[origIdx];
+    if(mode==='all'&&orig.recurrence_group){
       bills.forEach(b=>{
         if(b.recurrence_group===orig.recurrence_group&&b.due_date>=orig.due_date&&b.status!=='paid'){
           b.title=d.title;b.desc=d.desc;b.amount=d.amount;b.category=d.category;
@@ -1388,15 +1391,16 @@ function saveBill(id,mode){
       });
       DB.saveBills(bills);toast('Todas futuras atualizadas!');
     }else{
-      DB.updateBill(id,d);toast('Atualizada!');
+      bills[origIdx]={...orig,...d};
+      DB.saveBills(bills);toast('Atualizada!');
     }
   }else{
-    // Check recurrence
     const rec=document.getElementById('bRec')?.value||'';
     const recN=parseInt(document.getElementById('bRecN')?.value)||12;
     if(rec){
       const group='rec_'+Date.now();
       const baseDate=new Date(d.due_date+'T12:00:00');
+      const bills=DB.getBills();
       for(let i=0;i<recN;i++){
         const dt=new Date(baseDate);
         if(rec==='weekly')dt.setDate(dt.getDate()+i*7);
@@ -1404,8 +1408,9 @@ function saveBill(id,mode){
         else if(rec==='yearly')dt.setFullYear(dt.getFullYear()+i);
         const dd={...d,due_date:dt.toISOString().split('T')[0],recurrence:rec,recurrence_group:group,id:Date.now()+i,created_at:new Date().toISOString()};
         if(i>0)dd.status='pending';
-        const bills=DB.getBills();bills.push(dd);DB.saveBills(bills);
+        bills.push(dd);
       }
+      DB.saveBills(bills);
       toast(recN+' contas criadas!');
     }else{
       DB.addBill(d);toast('Criada!');
@@ -1575,10 +1580,11 @@ function updOS(id,s){DB.updateOrder(id,{status:s});toast('Status: '+SL[s]);close
 const statusCycle=['processing','pending','completed','cancelled'];
 function cycleStatus(id,e){e.stopPropagation();const o=DB.getOrders().find(x=>x.id===id);if(!o)return;const ci=statusCycle.indexOf(o.status);const ns=statusCycle[(ci+1)%statusCycle.length];DB.updateOrder(id,{status:ns});toast(SL[ns]);renderPage()}
 function openOrderModal(id){
-  const o=id?DB.getOrders().find(x=>x.id===id):null;const ps=DB.getProducts().filter(p=>p.status==='active');
+  const o=id?DB.getOrders().find(x=>x.id===id):null;const ps=DB.getProducts().filter(p=>p.status==='active').sort((a,b)=>a.name.localeCompare(b.name));
   const selCust=o?DB.getCustomers().find(c=>c.id===o.customer_id):null;
   openModal('<div class="modal-box-header"><h3>'+(o?'Editar':'Novo')+' Pedido</h3><button onclick="closeModal()" style="font-size:1.2rem;color:var(--text-muted)">✕</button></div><div class="modal-box-body"><div class="form-row"><div class="form-group" style="position:relative"><label>Cliente</label><input type="hidden" id="oC" value="'+(o?.customer_id||'')+'"><input type="text" id="oCSearch" value="'+(selCust?.name||'')+'" placeholder="Buscar cliente..." autocomplete="off" oninput="filterCustDD()" onfocus="filterCustDD()"><div id="oCDD" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:10;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);max-height:180px;overflow-y:auto;box-shadow:var(--shadow-lg)"></div></div><div class="form-group"><label>Data Entrega</label><input type="date" id="oED" value="'+(o?.event_date||calSelectedDate||'')+'"></div></div><div id="oCNewWrap" style="display:none;background:var(--surface);border-radius:var(--radius-sm);padding:.8rem;margin-bottom:1rem"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem"><strong style="font-size:.78rem">Novo Cliente</strong><button class="btn-icon" onclick="toggleNewCust(false)" style="width:24px;height:24px;font-size:.7rem">✕</button></div><div class="form-row"><div class="form-group" style="margin-bottom:.5rem"><label>Nome</label><input id="oCNewName" placeholder="Nome completo"></div><div class="form-group" style="margin-bottom:.5rem"><label>Telefone</label><input id="oCNewPhone" placeholder="+55 11 ..."></div></div><div class="form-row"><div class="form-group" style="margin-bottom:.5rem"><label>Email</label><input id="oCNewEmail" placeholder="email@..."></div><div class="form-group" style="margin-bottom:.5rem"><label>Tipo</label><select id="oCNewType"><option value="individual">Individual</option><option value="corporate">Corporativo</option></select></div></div><button class="btn btn-primary btn-sm" onclick="saveNewCustFromOrder()">Salvar Cliente</button></div><div class="form-group"><label>Itens</label><div style="display:flex;gap:.5rem;margin-bottom:.3rem;padding:0 0 .2rem"><div style="flex:3;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted)">Produto</div><div style="flex:1;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted)">Qtd.</div><div style="flex:1;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted)">Preço Un.</div><div style="width:32px"></div></div><div id="oI">'+(o?.items||[{product_id:'',qty:1}]).map((item,i)=>oiR(i,item,ps)).join('')+'</div><button class="btn btn-secondary btn-sm" onclick="addOI()" style="margin-top:.4rem">+ Item</button></div><div class="form-row"><div class="form-group"><label>Pagamento</label><select id="oP"><option value="pix" '+(o?.payment==='pix'?'selected':'')+'>PIX</option><option value="cash" '+(o?.payment==='cash'?'selected':'')+'>Dinheiro</option><option value="transfer" '+(o?.payment==='transfer'?'selected':'')+'>Transf.</option><option value="card" '+(o?.payment==='card'?'selected':'')+'>Cartão</option><option value="invoice" '+(o?.payment==='invoice'?'selected':'')+'>Fatura</option></select></div><div class="form-group"><label>Taxa Entrega</label><input type="number" id="oDel" value="'+(o?.delivery??10)+'" step="0.01"></div></div><div class="form-group"><label>Endereço de Entrega</label><input type="text" id="oAddr" value="'+(o?.address||'')+'" placeholder="Rua, número, bairro, cidade..."></div><div class="form-row"><div class="form-group"><label>Hora da Entrega</label><input type="time" id="oHora" value="'+(o?.hora_entrega||'')+'"></div><div class="form-group"><label>Local do Evento</label><input type="text" id="oLocal" value="'+(o?.local_evento||'')+'" placeholder="Salão, buffet, etc."></div></div><div class="form-row"><div class="form-group"><label>Cerimonialista</label><input type="text" id="oCer" value="'+(o?.cerimonialista||'')+'"></div><div class="form-group"><label>Decoradora</label><input type="text" id="oDec" value="'+(o?.decoradora||'')+'"></div></div><div class="form-group"><label>Notas</label><textarea id="oN">'+(o?.notes||'')+'</textarea></div><div class="form-group"><label>Status</label><div style="display:flex;gap:.4rem;flex-wrap:wrap" id="oStatusBtns">'+['processing','pending','completed','cancelled'].map(s=>'<button type="button" class="btn btn-sm '+((o?.status||'pending')===s?'btn-primary':'btn-secondary')+'" onclick="pickOrdStatus(\''+s+'\')" data-status="'+s+'">'+SL[s]+'</button>').join('')+'</div><input type="hidden" id="oStatus" value="'+(o?.status||'pending')+'"></div></div><div class="modal-box-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveO('+(id||'null')+')">Salvar</button></div>');
   document.addEventListener('click',closeCustDD);
+  document.addEventListener('click',function(e){if(!e.target.classList.contains('oipSearch'))document.querySelectorAll('.oipDD').forEach(d=>d.style.display='none')});
   if(!id)setTimeout(()=>{const el=document.getElementById('oCSearch');if(el)el.focus()},100);
 }
 function filterCustDD(){
@@ -1599,13 +1605,31 @@ function saveNewCustFromOrder(){
   document.getElementById('oCNewWrap').style.display='none';toast('Cliente "'+name+'" criado!');
 }
 let oiC=0;
-function oiR(i,item,ps){oiC=i+1;const curPrice=item.price||'';return'<div class="oir" style="margin-bottom:.5rem;border-bottom:1px solid var(--border);padding-bottom:.5rem"><div style="display:flex;gap:.5rem;align-items:end"><div style="flex:3"><select class="oip" onchange="oiPriceHint(this)"><option value="">Selecionar...</option>'+ps.map(p=>'<option value="'+p.id+'" data-price="'+p.price+'" '+(item.product_id==p.id?'selected':'')+'>'+p.name+' ('+fmt(p.price)+')</option>').join('')+'</select></div><div style="flex:1"><input type="number" class="oiq" value="'+(item.qty||1)+'" min="1" placeholder="Qtd"></div><div style="flex:1"><input type="number" step="0.01" class="oiprice" value="'+curPrice+'" placeholder="Preço" title="Preço unitário para este pedido"></div><button class="btn-icon" onclick="this.closest(\'.oir\').remove()">✕</button></div><div style="margin-top:.3rem"><input class="oidesc" value="'+(item.desc||'')+'" placeholder="Descrição / observação do item..." style="font-size:.78rem;width:100%"></div></div>'}
-function oiPriceHint(sel){const row=sel.closest('.oir');const priceInput=row.querySelector('.oiprice');if(sel.value&&sel.selectedOptions[0]){priceInput.value=sel.selectedOptions[0].dataset.price||''}else{priceInput.value=''}}
-function addOI(){const ps=DB.getProducts().filter(p=>p.status==='active');const d=document.createElement('div');d.innerHTML=oiR(oiC,{},ps);document.getElementById('oI').appendChild(d.firstElementChild)}
+function oiR(i,item,ps){oiC=i+1;const curPrice=item.price||'';const selProd=item.product_id?ps.find(p=>p.id==item.product_id):null;return'<div class="oir" style="margin-bottom:.5rem;border-bottom:1px solid var(--border);padding-bottom:.5rem"><div style="display:flex;gap:.5rem;align-items:end"><div style="flex:3;position:relative"><input type="hidden" class="oip" value="'+(item.product_id||'')+'"><input type="text" class="oipSearch" value="'+(selProd?selProd.name:'')+'" placeholder="Buscar produto..." autocomplete="off" oninput="filterProdDD(this)" onfocus="filterProdDD(this)"><div class="oipDD" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:10;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);max-height:180px;overflow-y:auto;box-shadow:var(--shadow-lg)"></div></div><div style="flex:1"><input type="number" class="oiq" value="'+(item.qty||1)+'" min="1" placeholder="Qtd"></div><div style="flex:1"><input type="number" step="0.01" class="oiprice" value="'+curPrice+'" placeholder="Preço" title="Preço unitário para este pedido"></div><button class="btn-icon" onclick="this.closest(\'.oir\').remove()">✕</button></div><div style="margin-top:.3rem"><input class="oidesc" value="'+(item.desc||'')+'" placeholder="Descrição / observação do item..." style="font-size:.78rem;width:100%"></div></div>'}
+function filterProdDD(input){
+  const row=input.closest('.oir');const dd=row.querySelector('.oipDD');if(!dd)return;
+  const q=input.value.toLowerCase();
+  const ps=DB.getProducts().filter(p=>p.status==='active').sort((a,b)=>a.name.localeCompare(b.name));
+  const filtered=ps.filter(p=>!q||p.name.toLowerCase().includes(q));
+  dd.style.display='block';
+  dd.innerHTML=filtered.slice(0,20).map(p=>'<div style="padding:.45rem .8rem;cursor:pointer;font-size:.82rem;border-bottom:1px solid var(--border);transition:background .15s" onmousedown="pickProd(this,'+p.id+',\''+p.name.replace(/'/g,"\\'")+'\','+p.price+')" onmouseover="this.style.background=\'var(--surface-hover)\'" onmouseout="this.style.background=\'none\'"><strong>'+p.name+'</strong><span style="float:right;color:var(--text-muted);font-size:.75rem">'+fmt(p.price)+'</span></div>').join('');
+  if(!filtered.length)dd.innerHTML='<div style="padding:.6rem .8rem;font-size:.78rem;color:var(--text-muted)">Nenhum produto encontrado</div>';
+}
+function pickProd(el,id,name,price){
+  const row=el.closest('.oir');
+  row.querySelector('.oip').value=id;
+  row.querySelector('.oipSearch').value=name;
+  row.querySelector('.oipDD').style.display='none';
+  const priceInput=row.querySelector('.oiprice');
+  if(!priceInput.value||priceInput.value==='0')priceInput.value=price;
+  else priceInput.value=price;
+  row.querySelector('.oiq').focus();
+}
+function addOI(){const ps=DB.getProducts().filter(p=>p.status==='active').sort((a,b)=>a.name.localeCompare(b.name));const d=document.createElement('div');d.innerHTML=oiR(oiC,{},ps);document.getElementById('oI').appendChild(d.firstElementChild);d.querySelector('.oipSearch')?.focus()}
 function pickOrdStatus(s){document.getElementById('oStatus').value=s;document.querySelectorAll('#oStatusBtns button').forEach(b=>{b.className='btn btn-sm '+(b.dataset.status===s?'btn-primary':'btn-secondary')})}
 function saveO(id){
   const cid=parseInt(document.getElementById('oC').value);const cust=DB.getCustomers().find(c=>c.id===cid);if(!cust){toast('Selecione cliente','error');return}
-  const items=[];let sub=0;document.querySelectorAll('.oir').forEach(r=>{const s=r.querySelector('.oip'),q=parseInt(r.querySelector('.oiq').value)||0,priceInput=r.querySelector('.oiprice'),descInput=r.querySelector('.oidesc');if(s.value&&q>0){let pr=parseFloat(priceInput?.value);if(isNaN(pr)||pr<=0)pr=parseFloat(s.selectedOptions[0].dataset.price)||0;const prod=DB.getProducts().find(p=>p.id==s.value);const desc=(descInput?.value||'').trim();items.push({product_id:parseInt(s.value),name:prod?.name||'',qty:q,price:pr,desc});sub+=pr*q}});
+  const items=[];let sub=0;document.querySelectorAll('.oir').forEach(r=>{const pid=r.querySelector('.oip')?.value,q=parseInt(r.querySelector('.oiq').value)||0,priceInput=r.querySelector('.oiprice'),descInput=r.querySelector('.oidesc');if(pid&&q>0){let pr=parseFloat(priceInput?.value);const prod=DB.getProducts().find(p=>p.id==pid);if(isNaN(pr)||pr<=0)pr=prod?.price||0;const desc=(descInput?.value||'').trim();items.push({product_id:parseInt(pid),name:prod?.name||'',qty:q,price:pr,desc});sub+=pr*q}});
   if(!items.length){toast('Adicione itens','error');return}const del=parseFloat(document.getElementById('oDel').value)||0;
   const selStatus=document.getElementById('oStatus')?.value||'pending';
   const d={customer_id:cid,customer_name:cust.name,items,subtotal:sub,delivery:del,total:sub+del,status:selStatus,payment:document.getElementById('oP').value,event_date:document.getElementById('oED').value,address:document.getElementById('oAddr').value.trim(),hora_entrega:document.getElementById('oHora').value,local_evento:document.getElementById('oLocal').value.trim(),cerimonialista:document.getElementById('oCer').value.trim(),decoradora:document.getElementById('oDec').value.trim(),notes:document.getElementById('oN').value.trim()};
