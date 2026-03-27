@@ -162,7 +162,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 
 
 @media(max-width:1200px){.cal-layout{grid-template-columns:1fr 280px}}
-@media(max-width:1024px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.menu-toggle{display:block}.stats-row{grid-template-columns:repeat(2,1fr)}.cal-layout{grid-template-columns:1fr}}
+@media(max-width:1024px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.menu-toggle{display:block}.stats-row{grid-template-columns:repeat(2,1fr)}.cal-layout{grid-template-columns:1fr}.dash-tables{grid-template-columns:1fr!important}}
 @media(max-width:640px){.content{padding:1rem}.topbar{padding:.6rem 1rem}.stats-row{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}.panel-header{flex-direction:column;align-items:flex-start}.cal-day{min-height:60px}.day-event{font-size:.5rem}}
 </style>
 </head>
@@ -1148,7 +1148,7 @@ function renderPage(){
 function updateBadges(){const p=DB.getOrders().filter(o=>o.status==='pending').length;document.getElementById('ordersBadge').textContent=p;document.getElementById('notifDot').style.display=p>0?'block':'none'}
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('open')}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('open')}
-function openModal(h){document.getElementById('modalBox').innerHTML=h;document.getElementById('modal').classList.add('open')}
+function openModal(h){hideCalTip();document.getElementById('modalBox').innerHTML=h;document.getElementById('modal').classList.add('open')}
 function closeModal(){document.getElementById('modal').classList.remove('open');document.removeEventListener('click',closeCustDD)}
 function toast(m,t='success'){const e=document.createElement('div');e.className='toast '+t;e.textContent=m;document.getElementById('toasts').appendChild(e);setTimeout(()=>{e.style.opacity='0';setTimeout(()=>e.remove(),300)},2500)}
 function getCur(){return DB.getSettings().currency||'BRL'}
@@ -1182,12 +1182,12 @@ function renderDashboard(c){
       <div onclick="navigate('bills')" style="cursor:pointer;display:flex;align-items:center;gap:.6rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem 1rem;flex:1;min-width:180px;transition:var(--transition)" onmouseover="this.style.borderColor='var(--border-active)'" onmouseout="this.style.borderColor='var(--border)'"><span style="font-size:1.1rem">💸</span><div><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600">Contas do Mês</div><div style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;line-height:1.2">${fmt(billsAmt)}</div></div><span style="margin-left:auto;font-size:.65rem;font-weight:600;color:${overdue>0?'var(--danger)':'var(--success)'}">${overdue>0?'⚠ '+overdue+' venc.':'✓ OK'}</span></div>
     </div>
     <div class="cal-layout">
-      <div class="cal-panel"><div class="cal-header"><h3>Calendário</h3><div class="panel-actions"><button class="btn btn-sm btn-primary" onclick="openOrderModal()">+ Pedido</button><button class="btn btn-sm btn-secondary" onclick="openApptModal()">+ Compromisso</button><button class="btn btn-sm btn-secondary" onclick="openBillModal()">+ Conta</button></div><div class="cal-nav"><button onclick="calPrev()">◀</button><div class="cal-month-label" id="calML"></div><button onclick="calNext()">▶</button><button class="btn btn-sm btn-secondary" style="margin-left:.5rem" onclick="calToday()">Hoje</button></div></div><div class="cal-grid" id="calGrid"></div>
+      <div class="cal-panel"><div class="cal-header"><h3>Calendário</h3><div class="panel-actions"><button class="btn btn-sm btn-primary" onclick="openOrderModal()">+ Pedido</button><button class="btn btn-sm btn-secondary" onclick="openApptModal()">+ Compromisso</button><button class="btn btn-sm btn-secondary" onclick="openBillModal()">+ Conta</button></div><div class="cal-nav"><button onclick="calPrev()">◀</button><div class="cal-month-label" id="calML" style="cursor:pointer;position:relative" onclick="toggleCalDatePicker()"></div><input type="date" id="calDatePicker" style="position:absolute;opacity:0;width:0;height:0;pointer-events:none" onchange="jumpToCalDate(this.value)"><button onclick="calNext()">▶</button><button class="btn btn-sm btn-secondary" style="margin-left:.5rem" onclick="calToday()">Hoje</button></div></div><div class="cal-grid" id="calGrid"></div>
         <div class="cal-legend"><div class="cal-legend-item"><div class="ldot" style="background:var(--delivery)"></div>Pedidos</div><div class="cal-legend-item"><div class="ldot" style="background:var(--orcamento)"></div>Orçamentos</div><div class="cal-legend-item"><div class="ldot" style="background:var(--appointment)"></div>Compromissos</div><div class="cal-legend-item"><div class="ldot" style="background:var(--bill)"></div>Contas</div></div></div>
       <div class="cal-panel cal-sidebar"><div class="cal-header"><h3>Detalhe do Dia</h3></div><div id="calDD"></div>
         </div></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem" class="dash-tables">
       <div class="panel"><div class="panel-header"><div class="panel-title">Próximos <span>Pedidos</span></div><button class="btn btn-secondary btn-sm" onclick="navigate('orders')">Ver todos →</button></div>
         <div class="panel-body no-pad"><div class="table-wrap"><table><thead><tr><th>Pedido</th><th>Cliente</th><th>Entrega</th><th>Total</th><th>Status</th></tr></thead>
         <tbody>${orders.filter(o=>o.status!=='cancelled'&&o.status!=='completed'&&o.event_date).sort((a,b)=>new Date(a.event_date)-new Date(b.event_date)).slice(0,5).map(o=>`<tr style="cursor:pointer" onclick="viewOrder(${o.id})"><td><strong>${o.number}</strong></td><td>${o.customer_name}</td><td style="color:var(--delivery);font-weight:600">${fmtDate(o.event_date)}</td><td><strong>${fmt(o.total)}</strong></td><td><span class="status-badge ${SC[o.status]}" style="cursor:pointer" onclick="event.stopPropagation();cycleStatus(${o.id},event)">${SL[o.status]}</span></td></tr>`).join('')}</tbody></table></div></div></div>
@@ -1214,7 +1214,7 @@ function renderCal(){
     const de=events.filter(e=>e.date===ds);
     h+='<div class="cal-day'+(ds===todayStr?' today':'')+(ds===calSelectedDate?' selected':'')+'" onclick="selDay(\''+ds+'\')">';
     h+='<div class="day-num">'+d+'</div><div class="day-events">';
-    de.slice(0,2).forEach(e=>{const clk=e.type==='delivery'||e.type==='orcamento'?'viewOrder('+e.id+')':e.type==='appointment'?'openApptModal('+e.id+')':'openBillModal('+e.id+')';const tipEvt=e.tooltip?(' onmouseenter="showCalTip(event,this)" onmouseleave="hideCalTip()" data-tip="'+e.tooltip.replace(/"/g,'&quot;')+'" data-tiphead="'+e.title.replace(/"/g,'&quot;')+'"'):'';h+='<div class="day-event '+e.type+'"'+tipEvt+' onclick="event.stopPropagation();'+clk+'">'+e.title+'</div>'});
+    de.slice(0,2).forEach(e=>{const clk=e.type==='delivery'||e.type==='orcamento'?'viewOrder('+e.id+')':e.type==='appointment'?'openApptModal('+e.id+')':'openBillModal('+e.id+')';const tipEvt=e.tooltip?(' onmouseenter="showCalTip(event,this)" onmouseleave="hideCalTip()" data-tip="'+e.tooltip.replace(/"/g,'&quot;')+'" data-tiphead="'+e.title.replace(/"/g,'&quot;')+'"'):'';h+='<div class="day-event '+e.type+'"'+tipEvt+' onclick="event.stopPropagation();hideCalTip();'+clk+'">'+e.title+'</div>'});
     if(de.length>2)h+='<div class="day-more">+'+(de.length-2)+' mais</div>';
     h+='</div></div>';
   }
@@ -1229,6 +1229,8 @@ function hideCalTip(){const t=document.getElementById('calTooltip');if(t)t.style
 function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--}renderCal()}
 function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++}renderCal()}
 function calToday(){const t=new Date();calYear=t.getFullYear();calMonth=t.getMonth();calSelectedDate=t.toISOString().split('T')[0];renderCal()}
+function toggleCalDatePicker(){const dp=document.getElementById('calDatePicker');dp.value=calSelectedDate;dp.showPicker?dp.showPicker():dp.click()}
+function jumpToCalDate(v){if(!v)return;const d=new Date(v+'T12:00:00');calYear=d.getFullYear();calMonth=d.getMonth();calSelectedDate=v;renderCal()}
 
 function renderDD(){
   const el=document.getElementById('calDD');if(!el)return;
