@@ -128,7 +128,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 .cal-nav .cal-month-label span{color:var(--copper);font-style:italic}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
 .cal-dow{padding:.6rem .2rem;text-align:center;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);border-bottom:1px solid var(--border)}
-.cal-day{height:100px;padding:.4rem;border-right:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;position:relative;overflow:hidden}
+.cal-day{height:130px;padding:.4rem;border-right:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;position:relative;overflow:hidden}
 .cal-day:nth-child(7n){border-right:none}
 .cal-day:hover{background:var(--surface)}
 .cal-day.other-month{opacity:.25;pointer-events:none}
@@ -1205,9 +1205,9 @@ function renderCal(){
   document.querySelector('.calMLtext').innerHTML=ms[calMonth]+' <span>'+calYear+'</span>';
   const dpEl=document.getElementById('calDatePicker');if(dpEl)dpEl.value=calSelectedDate;
   const events=[];
-  DB.getOrders().filter(o=>o.status!=='cancelled'&&o.event_date).forEach(o=>{const d=new Date(o.event_date+'T12:00:00');if(d.getFullYear()===calYear&&d.getMonth()===calMonth){const tqty=(o.items||[]).reduce((s,i)=>s+i.qty,0);const tip=(o.items||[]).map(i=>i.qty+'x '+i.name).join('\n');const evType=o.status==='processing'?'orcamento':'delivery';events.push({type:evType,date:o.event_date,title:o.customer_name+' ('+tqty+')',id:o.id,tooltip:tip})}});
-  DB.getAppointments().forEach(a=>{const d=new Date(a.date+'T12:00:00');if(d.getFullYear()===calYear&&d.getMonth()===calMonth)events.push({type:'appointment',date:a.date,title:a.title,id:a.id})});
-  DB.getBills().forEach(b=>{const d=new Date(b.due_date+'T12:00:00');if(d.getFullYear()===calYear&&d.getMonth()===calMonth)events.push({type:'bill',date:b.due_date,title:b.title,id:b.id})});
+  DB.getOrders().filter(o=>o.status!=='cancelled'&&o.event_date).forEach(o=>{const d=new Date(o.event_date+'T12:00:00');if(d.getFullYear()===calYear&&d.getMonth()===calMonth){const tqty=(o.items||[]).reduce((s,i)=>s+i.qty,0);const tip=(o.items||[]).map(i=>i.qty+'x '+i.name).join('\n');const evType=o.status==='processing'?'orcamento':'delivery';events.push({type:evType,date:o.event_date,title:tqty+' — '+o.customer_name,id:o.id,tooltip:tip,qty:tqty})}});
+  DB.getAppointments().forEach(a=>{const d=new Date(a.date+'T12:00:00');if(d.getFullYear()===calYear&&d.getMonth()===calMonth)events.push({type:'appointment',date:a.date,title:a.title,id:a.id,qty:0})});
+  DB.getBills().forEach(b=>{const d=new Date(b.due_date+'T12:00:00');if(d.getFullYear()===calYear&&d.getMonth()===calMonth)events.push({type:'bill',date:b.due_date,title:b.title,id:b.id,qty:0})});
   const fd=new Date(calYear,calMonth,1).getDay(),dim=new Date(calYear,calMonth+1,0).getDate(),dip=new Date(calYear,calMonth,0).getDate();
   const todayStr=new Date().toISOString().split('T')[0];
   let h='';['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d=>h+='<div class="cal-dow">'+d+'</div>');
@@ -1215,10 +1215,11 @@ function renderCal(){
   for(let d=1;d<=dim;d++){
     const ds=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const de=events.filter(e=>e.date===ds);
+    const dayQty=de.reduce((s,e)=>s+(e.qty||0),0);
     h+='<div class="cal-day'+(ds===todayStr?' today':'')+(ds===calSelectedDate?' selected':'')+'" onclick="selDay(\''+ds+'\')">';
-    h+='<div class="day-num">'+d+'</div><div class="day-events">';
-    de.slice(0,2).forEach(e=>{const clk=e.type==='delivery'||e.type==='orcamento'?'viewOrder('+e.id+')':e.type==='appointment'?'openApptModal('+e.id+')':'openBillModal('+e.id+')';const tipEvt=e.tooltip?(' onmouseenter="showCalTip(event,this)" onmouseleave="hideCalTip()" data-tip="'+e.tooltip.replace(/"/g,'&quot;')+'" data-tiphead="'+e.title.replace(/"/g,'&quot;')+'"'):'';h+='<div class="day-event '+e.type+'"'+tipEvt+' onclick="event.stopPropagation();hideCalTip();'+clk+'">'+e.title+'</div>'});
-    if(de.length>2)h+='<div class="day-more">+'+(de.length-2)+' mais</div>';
+    h+='<div class="day-num">'+d+(dayQty>0?'<span style="font-size:.55rem;color:var(--text-muted);font-weight:400;margin-left:.3rem">'+dayQty+'</span>':'')+'</div><div class="day-events">';
+    de.slice(0,3).forEach(e=>{const clk=e.type==='delivery'||e.type==='orcamento'?'viewOrder('+e.id+')':e.type==='appointment'?'openApptModal('+e.id+')':'openBillModal('+e.id+')';const tipEvt=e.tooltip?(' onmouseenter="showCalTip(event,this)" onmouseleave="hideCalTip()" data-tip="'+e.tooltip.replace(/"/g,'&quot;')+'" data-tiphead="'+e.title.replace(/"/g,'&quot;')+'"'):'';h+='<div class="day-event '+e.type+'"'+tipEvt+' onclick="event.stopPropagation();hideCalTip();'+clk+'">'+e.title+'</div>'});
+    if(de.length>3)h+='<div class="day-more">+'+(de.length-3)+' mais</div>';
     h+='</div></div>';
   }
   const tc=fd+dim;const rem=tc%7===0?0:7-tc%7;
