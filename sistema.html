@@ -1232,7 +1232,7 @@ function renderCal(){
     const de=events.filter(e=>e.date===ds);
     const dayQty=de.reduce((s,e)=>s+(e.qty||0),0);
     h+='<div class="cal-day'+(ds===todayStr?' today':'')+(ds===calSelectedDate?' selected':'')+'" onclick="selDay(\''+ds+'\')">';
-    h+='<div class="day-num">'+d+(dayQty>0?'<span style="font-size:.55rem;color:var(--text-muted);font-weight:400;margin-left:.3rem">'+dayQty+'</span>':'')+'</div><div class="day-events">';
+    h+='<div class="day-num">'+d+(dayQty>0?'<span style="font-size:.55rem;color:var(--copper);font-weight:400;margin-left:.3rem">('+dayQty+')</span>':'')+'</div><div class="day-events">';
     de.slice(0,3).forEach(e=>{const clk=e.type==='delivery'||e.type==='orcamento'?'viewOrder('+e.id+')':e.type==='appointment'?'openApptModal('+e.id+')':'openBillModal('+e.id+')';const tipEvt=e.tooltip?(' onmouseenter="showCalTip(event,this)" onmouseleave="hideCalTip()" data-tip="'+e.tooltip.replace(/"/g,'&quot;')+'" data-tiphead="'+e.title.replace(/"/g,'&quot;')+'"'):'';h+='<div class="day-event '+e.type+'"'+tipEvt+' onclick="event.stopPropagation();hideCalTip();'+clk+'">'+e.title+'</div>'});
     if(de.length>3)h+='<div class="day-more">+'+(de.length-3)+' mais</div>';
     h+='</div></div>';
@@ -1260,13 +1260,17 @@ function renderDD(){
   DB.getOrders().filter(o=>o.status!=='cancelled'&&o.event_date===calSelectedDate).forEach(o=>{const evType=o.status==='processing'?'orcamento':'delivery';evs.push({type:evType,title:o.number+' — '+o.customer_name,meta:fmt(o.total)+' · '+SL[o.status],id:o.id})});
   DB.getAppointments().filter(a=>a.date===calSelectedDate).forEach(a=>evs.push({type:'appointment',title:a.title,meta:(a.time||'')+(a.customer_name?' — '+a.customer_name:''),id:a.id}));
   DB.getBills().filter(b=>b.due_date===calSelectedDate).forEach(b=>evs.push({type:'bill',title:b.title,meta:fmt(b.amount)+' · '+BL[b.status],id:b.id}));
-  const del=evs.filter(e=>e.type==='delivery'),apt=evs.filter(e=>e.type==='appointment'),bil=evs.filter(e=>e.type==='bill');
-  el.innerHTML='<div class="day-detail-date">'+dt.getDate()+' '+mn[dt.getMonth()]+'</div><div class="day-detail-weekday">'+wd[dt.getDay()]+'</div><div class="day-detail-list">'
+  const del=evs.filter(e=>e.type==='delivery'),orc=evs.filter(e=>e.type==='orcamento'),apt=evs.filter(e=>e.type==='appointment'),bil=evs.filter(e=>e.type==='bill');
+  const hasOrders=DB.getOrders().filter(o=>o.status!=='cancelled'&&o.event_date===calSelectedDate).length>0;
+  const dayTotalQty=DB.getOrders().filter(o=>o.status!=='cancelled'&&o.event_date===calSelectedDate).reduce((s,o)=>(o.items||[]).reduce((ss,i)=>ss+i.qty,s),0);
+  el.innerHTML='<div class="day-detail-date">'+dt.getDate()+' '+mn[dt.getMonth()]+'</div><div class="day-detail-weekday">'+wd[dt.getDay()]+(dayTotalQty>0?' <span style="color:var(--copper);font-weight:700">('+dayTotalQty+' itens)</span>':'')+'</div><div class="day-detail-list">'
     +(evs.length===0?'<div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:.82rem">📭 Nenhum evento</div>':'')
-    +(del.length?'<div class="day-detail-section"><h5><div class="dot-legend" style="background:var(--delivery)"></div>Entregas ('+del.length+')</h5>'+del.map(e=>'<div class="detail-item delivery" onclick="viewOrder('+e.id+')"><div class="di-title">'+e.title+'</div><div class="di-meta">'+e.meta+'</div></div>').join('')+'</div>':'')
+    +(del.length?'<div class="day-detail-section"><h5><div class="dot-legend" style="background:var(--delivery)"></div>Pedidos ('+del.length+')</h5>'+del.map(e=>'<div class="detail-item delivery" onclick="viewOrder('+e.id+')"><div class="di-title">'+e.title+'</div><div class="di-meta">'+e.meta+'</div></div>').join('')+'</div>':'')
+    +(orc.length?'<div class="day-detail-section"><h5><div class="dot-legend" style="background:var(--orcamento)"></div>Orçamentos ('+orc.length+')</h5>'+orc.map(e=>'<div class="detail-item orcamento" onclick="viewOrder('+e.id+')"><div class="di-title">'+e.title+'</div><div class="di-meta">'+e.meta+'</div></div>').join('')+'</div>':'')
     +(apt.length?'<div class="day-detail-section"><h5><div class="dot-legend" style="background:var(--appointment)"></div>Compromissos ('+apt.length+')</h5>'+apt.map(e=>'<div class="detail-item appointment" onclick="openApptModal('+e.id+')"><div class="di-title">'+e.title+'</div><div class="di-meta">'+e.meta+'</div></div>').join('')+'</div>':'')
     +(bil.length?'<div class="day-detail-section"><h5><div class="dot-legend" style="background:var(--bill)"></div>Contas ('+bil.length+')</h5>'+bil.map(e=>'<div class="detail-item bill" onclick="openBillModal('+e.id+')"><div class="di-title">'+e.title+'</div><div class="di-meta">'+e.meta+'</div></div>').join('')+'</div>':'')
-    +'</div>';
+    +'</div>'
+    +(hasOrders?'<div style="padding:.8rem 1rem;border-top:1px solid var(--border);text-align:center"><button class="btn btn-sm btn-secondary" onclick="printDayReport(\''+calSelectedDate+'\')" style="font-size:.72rem;opacity:.7">🖨️ Relatório do dia</button></div>':'');
 }
 
 // ===== APPOINTMENTS =====
@@ -1534,15 +1538,11 @@ function getFilteredOrders(){
   if(dtF)o=o.filter(x=>x.event_date&&x.event_date<=dtF);
   return o;
 }
-function printProductionReport(){
-  const orders=getFilteredOrders().filter(x=>x.status==='pending');
+function printProductionReport(customOrders,customPeriodo){
+  const orders=customOrders||getFilteredOrders().filter(x=>x.status==='pending');
   if(!orders.length){toast('Nenhum pedido para o relatório','error');return}
-  const dtI=document.getElementById('fODtI')?.value||'';
-  const dtF=document.getElementById('fODtF')?.value||'';
-  let periodo='Todos os pedidos';
-  if(dtI&&dtF)periodo=fmtDate(dtI)+' a '+fmtDate(dtF);
-  else if(dtI)periodo='A partir de '+fmtDate(dtI);
-  else if(dtF)periodo='Até '+fmtDate(dtF);
+  let periodo=customPeriodo||'';
+  if(!periodo){const dtI=document.getElementById('fODtI')?.value||'';const dtF=document.getElementById('fODtF')?.value||'';periodo='Todos os pedidos';if(dtI&&dtF)periodo=fmtDate(dtI)+' a '+fmtDate(dtF);else if(dtI)periodo='A partir de '+fmtDate(dtI);else if(dtF)periodo='Até '+fmtDate(dtF)}
   // Build totals summary
   const prodTotals={};
   orders.forEach(o=>{(o.items||[]).forEach(i=>{const k=i.name||'Produto';if(!prodTotals[k])prodTotals[k]=0;prodTotals[k]+=i.qty})});
@@ -1606,6 +1606,11 @@ ${(()=>{
 </tbody></table>
 </body></html>`);
   w.document.close();
+}
+function printDayReport(dateStr){
+  const dayOrders=DB.getOrders().filter(x=>x.status!=='cancelled'&&x.event_date===dateStr);
+  if(!dayOrders.length){toast('Nenhum pedido para este dia','error');return}
+  printProductionReport(dayOrders,fmtDate(dateStr));
 }
 function viewOrder(id){
   const o=DB.getOrders().find(x=>x.id===id);if(!o)return;
